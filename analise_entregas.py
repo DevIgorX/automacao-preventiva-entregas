@@ -10,6 +10,7 @@ COLUNA_CHAVE_PREVENTIVA = "PEDIDO"
 COLUNA_CHAVE_RELATORIO = "Pedido"
 COLUNA_STATUS = "Tipo"
 TEXTO_STATUS_ENTREGUE = "Entrega Realizada Normalmente"
+TEXTO_STATUS_DEVOLVIDO = "Mercadoria devolvida ao CD"
 # ==============================================================================
 # --- FIM DAS CONFIGURAÇÕES ---
 # ==============================================================================
@@ -19,13 +20,13 @@ nome_arquivo_preventiva = None
 nome_arquivo_relatorio = None
 
 # --- LÓGICA DE BUSCA CORRIGIDA ---
-for nome_do_arquivo in os.listdir("."):
+for nome_do_arquivo in os.listdir("."): #Retorna uma lista de nomes de arquivos e pastas dentro do diretório - "." isso significa o diretório atual
     # Verifica o padrão E a extensão do arquivo para ser mais específico
     if nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".xlsx"):
         nome_arquivo_preventiva = nome_do_arquivo
         print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva}")
         
-    if PADRAO_ARQUIVO_RELATORIO in nome_do_arquivo and nome_do_arquivo.endswith(".xls"):
+    if PADRAO_ARQUIVO_RELATORIO in nome_do_arquivo and nome_do_arquivo.endswith(".xls"): 
         nome_arquivo_relatorio = nome_do_arquivo
         print(f"-> Arquivo de relatório encontrado: {nome_arquivo_relatorio}")
 
@@ -52,38 +53,52 @@ df_relatorio.columns = df_relatorio.columns.str.strip()
 
 if COLUNA_CHAVE_PREVENTIVA not in df_preventiva.columns:
     print(f"ERRO: A coluna '{COLUNA_CHAVE_PREVENTIVA}' não foi encontrada no arquivo de preventiva!")
-    exit()
+    exit() #exit() é usado para parar a execução do programa imediatamente
 
 if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
     print(f"ERRO: A coluna '{COLUNA_CHAVE_RELATORIO}' não foi encontrada no relatório!")
     exit()
 
 print("Cruzando os dados dos dois arquivos...")
-df_resultado = pd.merge(
-    df_preventiva, 
-    df_relatorio, 
-    left_on=COLUNA_CHAVE_PREVENTIVA, 
-    right_on=COLUNA_CHAVE_RELATORIO, 
-    how="left"
+df_resultado = pd.merge(df_preventiva, df_relatorio, left_on=COLUNA_CHAVE_PREVENTIVA, right_on=COLUNA_CHAVE_RELATORIO, how="left"
 )
 
 print("Analisando e separando os pedidos...")
-pendentes_mask = (df_resultado[COLUNA_STATUS] != TEXTO_STATUS_ENTREGUE) | (df_resultado[COLUNA_STATUS].isna())
-df_pendentes = df_resultado[pendentes_mask]
 
+pendentes_mask = (
+    (df_resultado[COLUNA_STATUS] != TEXTO_STATUS_ENTREGUE) &
+    (df_resultado[COLUNA_STATUS] != TEXTO_STATUS_DEVOLVIDO) |
+    (df_resultado[COLUNA_STATUS].isna())
+)
+df_pendentes = df_resultado[pendentes_mask]
 entregues_mask = df_resultado[COLUNA_STATUS] == TEXTO_STATUS_ENTREGUE
 df_entregues = df_resultado[entregues_mask]
+devolvidos_mask = df_resultado[COLUNA_STATUS] == TEXTO_STATUS_DEVOLVIDO
+df_devolvidos = df_resultado[devolvidos_mask]
+df_finalizados = df_resultado[df_resultado[COLUNA_STATUS].isin([TEXTO_STATUS_ENTREGUE, TEXTO_STATUS_DEVOLVIDO])]
 
+#Gerando performance
+performance = (len(df_finalizados) / len(df_preventiva)) * 100
+meta_performance = 96.00
+
+#Gerando o arquivo de resultado
 output_filename = "Resultado_Monitoramento.xlsx"
 print(f"Gerando o arquivo de resultado: {output_filename}")
 
 with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
     df_pendentes.to_excel(writer, sheet_name="Pendentes", index=False)
     df_entregues.to_excel(writer, sheet_name="Entregues", index=False)
-    
+    df_devolvidos.to_excel(writer, sheet_name="Devolvidos", index=False)
+
+
 print("-" * 30)
 print("Análise concluída com sucesso!")
 print(f"Total de pedidos na preventiva: {len(df_preventiva)}")
 print(f"Pedidos entregues: {len(df_entregues)}")
+print(f"Pedidos devolvidos: {len(df_devolvidos)}")
+print(f"Pedidos finalizados: {len(df_finalizados)}")
 print(f"Pedidos pendentes para cobrar: {len(df_pendentes)}")
+print(f'Meta de Performance: {meta_performance:.2f}%')
+print(f'Performance Atual: {performance:.2f}%')
 print(f"O relatório '{output_filename}' foi criado nesta pasta.")
+
