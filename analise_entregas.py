@@ -4,9 +4,9 @@ import os
 # ==============================================================================
 # --- CONFIGURAções E PADRÕES DE NOMES ---
 # ==============================================================================
-PADRAO_ARQUIVO_PREVENTIVA = "PREVENTIVA"
+PADRAO_ARQUIVO_PREVENTIVA = "cd-etapa"
 PADRAO_ARQUIVO_RELATORIO = "entregas"
-COLUNA_CHAVE_PREVENTIVA = "PEDIDO"
+COLUNA_CHAVE_PREVENTIVA = "pedido_gemco"
 COLUNA_CHAVE_RELATORIO = "Pedido"
 COLUNA_STATUS = "Tipo"
 TEXTO_STATUS_ENTREGUE = "Entrega Realizada Normalmente"
@@ -22,7 +22,7 @@ nome_arquivo_relatorio = None
 # --- LÓGICA DE BUSCA CORRIGIDA ---
 for nome_do_arquivo in os.listdir("."): #Retorna uma lista de nomes de arquivos e pastas dentro do diretório - "." isso significa o diretório atual
     # Verifica o padrão E a extensão do arquivo para ser mais específico
-    if nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".xlsx"):
+    if nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".csv"):
         nome_arquivo_preventiva = nome_do_arquivo
         print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva}")
         
@@ -37,7 +37,7 @@ if not nome_arquivo_preventiva or not nome_arquivo_relatorio:
 
 try:
     print("\nLendo a planilha de preventiva...")
-    df_preventiva = pd.read_excel(nome_arquivo_preventiva)
+    df_preventiva = pd.read_csv(nome_arquivo_preventiva,sep='\t',encoding='latin-1')
     
     print("Lendo o relatório do Mobile Entregas...")
     df_relatorio = pd.read_excel(nome_arquivo_relatorio)
@@ -101,4 +101,5 @@ print(f"Pedidos pendentes para cobrar: {len(df_pendentes)}")
 print(f'Meta de Performance: {meta_performance:.2f}%')
 print(f'Performance Atual: {performance:.2f}%')
 print(f"O relatório '{output_filename}' foi criado nesta pasta.")
+
 
