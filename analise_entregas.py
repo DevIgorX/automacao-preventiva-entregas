@@ -16,29 +16,36 @@ TEXTO_STATUS_DEVOLVIDO = "Mercadoria devolvida ao CD"
 # ==============================================================================
 
 print("Procurando os arquivos na pasta...")
-nome_arquivo_preventiva = None
+nome_arquivo_preventiva_csv = None
+nome_arquivo_preventiva_excel = None
 nome_arquivo_relatorio = None
 
 # --- LÓGICA DE BUSCA CORRIGIDA ---
 for nome_do_arquivo in os.listdir("."): #Retorna uma lista de nomes de arquivos e pastas dentro do diretório - "." isso significa o diretório atual
     # Verifica o padrão E a extensão do arquivo para ser mais específico
     if nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".csv"):
-        nome_arquivo_preventiva = nome_do_arquivo
-        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva}")
-        
+        nome_arquivo_preventiva_csv = nome_do_arquivo
+        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_csv}")
+    elif nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".xlsx"):
+        nome_arquivo_preventiva_excel = nome_do_arquivo
+        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}")
+
     if PADRAO_ARQUIVO_RELATORIO in nome_do_arquivo and nome_do_arquivo.endswith(".xls"): 
         nome_arquivo_relatorio = nome_do_arquivo
         print(f"-> Arquivo de relatório encontrado: {nome_arquivo_relatorio}")
 
-if not nome_arquivo_preventiva or not nome_arquivo_relatorio:
+if not nome_arquivo_preventiva_csv and not nome_arquivo_preventiva_excel or not nome_arquivo_relatorio:
     print("-" * 30)
     print("ERRO: Um ou ambos os arquivos não foram encontrados na pasta.")
     exit()
 
 try:
     print("\nLendo a planilha de preventiva...")
-    df_preventiva = pd.read_csv(nome_arquivo_preventiva,sep='\t',encoding='latin-1')
-    
+    if nome_arquivo_preventiva_csv:
+       df_preventiva = pd.read_csv(nome_arquivo_preventiva_csv,sep='\t',encoding='latin-1')
+    elif nome_arquivo_preventiva_excel:
+        df_preventiva = pd.read_excel(nome_arquivo_preventiva_excel)
+
     print("Lendo o relatório do Mobile Entregas...")
     df_relatorio = pd.read_excel(nome_arquivo_relatorio)
     
@@ -100,6 +107,15 @@ print(f'Meta de Performance: {meta_performance:.2f}%')
 print(f'Performance Atual: {performance:.2f}%')
 print(f"O relatório '{output_filename}' foi criado nesta pasta.")
 
+resposta = input('Deseja ver a lista de pedidos pendentes? Sim/Não: ')
+
+if resposta == 'Sim':
+   df_resultado_relatorio = pd.read_excel('Resultado_Monitoramento.xlsx', sheet_name="Pendentes")
+   df_resultado_relatorio = df_resultado_relatorio[['Entregador', 'Tipo','pedido_gemco']]
+
+   print(f'Lista de pedidos: {df_resultado_relatorio}')
+else:
+    print('Analise Finalizada!')
 
 
 
