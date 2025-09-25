@@ -94,12 +94,12 @@ with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
 print("-" * 30)
 print("Análise concluída com sucesso!")
 print(f"Total de pedidos na preventiva: {len(df_preventiva)}")
-print(f"Pedidos entregues: {len(df_entregues)}")
-print(f"Pedidos devolvidos: {len(df_devolvidos)}")
 print(f"Pedidos finalizados: {len(df_finalizados)}")
 print(f"Pedidos pendentes para cobrar: {len(df_pendentes)}")
 print(f'Meta de Performance: {meta_performance:.2f}%')
 print(f'Performance Atual: {performance:.2f}%')
 print(f"O relatório '{output_filename}' foi criado nesta pasta.")
+
+
 
 
