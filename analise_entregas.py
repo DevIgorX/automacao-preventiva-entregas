@@ -1,6 +1,11 @@
 import pandas as pd
 import os
 
+# pd.set_option('display.max_rows', None)
+
+# # Configura pandas para mostrar todas as colunas
+# pd.set_option('display.max_columns', None)
+
 # ==============================================================================
 # --- CONFIGURAções E PADRÕES DE NOMES ---
 # ==============================================================================
