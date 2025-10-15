@@ -1,51 +1,53 @@
-from flask import render_template, request, redirect, url_for, Blueprint
+from flask import render_template, request, redirect, url_for, Blueprint, current_app
 import os
 import subprocess
-from main import app
-
-
-# Pega o caminho absoluto do script atual (main.py)
-caminho_script = os.path.abspath(__file__)
-# Pega o diretório do script (pasta 'app')
-diretorio_app = os.path.dirname(caminho_script)
-# Sobe um nível para chegar na pasta raiz do projeto
-diretorio_raiz = os.path.dirname(diretorio_app)
-# Define o caminho para a pasta de dados
-caminho_dados = os.path.join(diretorio_raiz, 'dados')
-
-# Configura a pasta de upload
-app.config['UPLOAD_FOLDER'] = caminho_dados
+import json # Importe a biblioteca JSON aqui também
 
 rotas = Blueprint('rotas', __name__)
 
 @rotas.route('/', methods=['GET', 'POST'])
 def iniciar():
     if request.method == 'POST':
-        # Verifica se os arquivos foram enviados
+        # ... (seu código para checar e salvar os arquivos permanece o mesmo)
         if 'preventiva' not in request.files or 'relatorio' not in request.files:
             return "Erro: Ambos os arquivos são necessários."
 
         arquivo_preventiva = request.files['preventiva']
         arquivo_relatorio = request.files['relatorio']
 
-        # Verifica se os nomes dos arquivos não estão vazios
         if arquivo_preventiva.filename == '' or arquivo_relatorio.filename == '':
             return "Erro: Nomes de arquivos não podem ser vazios."
 
-        # Salva os arquivos na pasta 'dados'
-        arquivo_preventiva.save(os.path.join(app.config['UPLOAD_FOLDER'], arquivo_preventiva.filename))
-        arquivo_relatorio.save(os.path.join(app.config['UPLOAD_FOLDER'], arquivo_relatorio.filename))
-
-        # Executa o script de análise e captura a saída
-        caminho_analise = os.path.join(diretorio_raiz, 'analise', 'analise_entregas.py')
-        resultado = subprocess.run(['python', caminho_analise], capture_output=True, text=True)
+        pasta_upload = current_app.config['UPLOAD_FOLDER']
         
-        # Passa a saída para a página de resultados
-        return redirect(url_for('resultado', saida=resultado.stdout))
+        arquivo_preventiva.save(os.path.join(pasta_upload, arquivo_preventiva.filename))
+        arquivo_relatorio.save(os.path.join(pasta_upload, arquivo_relatorio.filename))
 
+        diretorio_raiz_da_config = current_app.config['ROOT_DIR']
+        caminho_analise = os.path.join(diretorio_raiz_da_config, 'analise', 'analise_entregas.py')
+        
+        # O resultado agora terá o JSON em stdout e os logs em stderr
+        resultado = subprocess.run(['python', caminho_analise], capture_output=True, text=True, encoding='utf-8')
+        
+        # Se o script falhou, mostre o erro
+        if resultado.returncode != 0:
+            return f"<h1>Ocorreu um erro ao processar os arquivos:</h1><pre>{resultado.stderr}</pre>"
+        
+        # Carrega a string JSON para um dicionário Python
+        try:
+            dados_analise = json.loads(resultado.stdout)
+        except json.JSONDecodeError:
+            return f"<h1>Erro ao ler o resultado da análise.</h1><pre>Saída recebida: {resultado.stdout}</pre><pre>Logs: {resultado.stderr}</pre>"
+
+
+        # Em vez de redirecionar, renderiza a página de resultado diretamente com os dados
+        return render_template('resultado.html', data=dados_analise)
+
+    # Se for GET, apenas mostra a página de upload
     return render_template('index.html')
 
+# Esta rota agora é opcional, mas podemos mantê-la para o caso de acesso direto
 @rotas.route('/resultado')
 def resultado():
-    saida = request.args.get('saida', '')
-    return render_template('resultado.html', saida=saida)
+    # Como não temos mais dados, mostramos uma mensagem
+    return "<h1>Resultado da Análise</h1><p>Por favor, envie os arquivos na <a href='/'>página inicial</a> para ver um relatório.</p>"

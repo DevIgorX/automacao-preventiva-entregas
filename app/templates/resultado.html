@@ -3,11 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Resultado da Análise</title>
 </head>
 <body>
-    <h1>Resultado da Análise</h1>
-    <pre>{{ saida }}</pre>
-    <a href="/">Voltar</a>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-primary">Resultado da Análise</h1>
+            <a href="/" class="btn btn-secondary">Analisar Outros Arquivos</a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-center mb-3">
+                    <div class="card-header">Total de Pedidos</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ data.total_pedidos }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center text-white bg-success mb-3">
+                    <div class="card-header">Pedidos Finalizados</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ data.pedidos_finalizados }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center text-white bg-warning mb-3">
+                    <div class="card-header">Pendentes para Cobrar</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ data.pedidos_pendentes }}</h2>
+                    </div>
+                </div>
+            </div>
+             <div class="col-md-3">
+                <div class="card text-center text-white 
+                    {% if data.performance_atual >= data.meta_performance %} 
+                        bg-info 
+                    {% else %} 
+                        bg-danger 
+                    {% endif %} 
+                    mb-3">
+                    <div class="card-header">Performance Atual</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ data.performance_atual }}%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h5>Meta de Performance: {{ data.meta_performance }}%</h5>
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar 
+                    {% if data.performance_atual < data.meta_performance %}
+                        bg-danger
+                    {% else %}
+                        bg-success
+                    {% endif %}" 
+                    role="progressbar" 
+                    style="width: {{ data.performance_atual }}%;"
+                    aria-valuenow="{{ data.performance_atual }}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                    {{ data.performance_atual }}%
+                </div>
+            </div>
+        </div>
+
+        <h2 class="mt-5">Detalhes dos Pedidos Pendentes</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Cidade</th>
+                        <th>Pedido</th>
+                        <th>Entregador</th>
+                        <th>Status Atual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in data.lista_pendentes %}
+                    <tr>
+                        <td>{{ pedido['Cidade Cliente'] }}</td>
+                        <td>{{ pedido.pedido_gemco }}</td>
+                        <td>{{ pedido.Entregador }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ pedido.Tipo }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">Nenhum pedido pendente encontrado!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+         <p class="text-muted mt-3">O relatório completo <strong>{{ data.nome_relatorio }}</strong> foi gerado na pasta de dados do projeto.</p>
+    </div>
 </body>
 </html>

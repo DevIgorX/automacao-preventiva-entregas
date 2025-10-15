@@ -1,0 +1,23 @@
+body {
+            /* Fundo com gradiente suave */
+            background: linear-gradient(to right top, #6d83f2, #a1a9f5, #cfd2f8, #fbfbfb);
+            background-repeat: no-repeat;
+            min-height: 100vh; /* Garante que o gradiente cubra a tela toda */
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(100vh - 56px); /* Altura da tela menos a altura do navbar */
+        }
+        .card {
+            /* Adiciona um efeito de vidro fosco (backdrop-filter) */
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border-radius: 1rem;
+        }
+        .form-control, .btn {
+            border-radius: 0.5rem; /* Bordas levemente arredondadas */
+        }
