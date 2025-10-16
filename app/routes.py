@@ -51,3 +51,14 @@ def iniciar():
 def resultado():
     # Como não temos mais dados, mostramos uma mensagem
     return "<h1>Resultado da Análise</h1><p>Por favor, envie os arquivos na <a href='/'>página inicial</a> para ver um relatório.</p>"
+
+
+@rotas.route('/excluir_dados')
+def excluir_dados():
+    pasta_dados = current_app.config['UPLOAD_FOLDER']
+   
+    for arquivo in os.listdir(pasta_dados):
+        caminho_arquivo = os.path.join(pasta_dados, arquivo)
+        os.remove(caminho_arquivo)
+   
+    return redirect('/')
