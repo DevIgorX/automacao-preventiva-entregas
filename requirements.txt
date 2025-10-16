@@ -1,1 +1,1 @@
-pip install openpyxl xlrd
+pip install pandas openpyxl xlrd flask
