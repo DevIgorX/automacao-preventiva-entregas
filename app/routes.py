@@ -56,9 +56,11 @@ def resultado():
 @rotas.route('/excluir_dados')
 def excluir_dados():
     pasta_dados = current_app.config['UPLOAD_FOLDER']
-   
+    arquivo_gitkeep = current_app.config['GITKEEP']
     for arquivo in os.listdir(pasta_dados):
         caminho_arquivo = os.path.join(pasta_dados, arquivo)
+        if caminho_arquivo == arquivo_gitkeep:
+            exit()
         os.remove(caminho_arquivo)
    
     return redirect('/')
