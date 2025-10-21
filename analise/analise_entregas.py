@@ -1,7 +1,9 @@
+
 import pandas as pd
 import os
 import json # Importe a biblioteca JSON
 import sys  # Importe a biblioteca sys para redirecionar a saída
+
 
 # ... (toda a parte inicial do seu código permanece igual)
 # ... (lógica para encontrar caminhos, etc.)
@@ -84,9 +86,9 @@ if COLUNA_CHAVE_PREVENTIVA not in df_preventiva.columns:
 if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
     print(f"ERRO: A coluna '{COLUNA_CHAVE_RELATORIO}' não foi encontrada no relatório!", file=sys.stderr)
     exit()
-#desenvolver filtros para pedidos que estão foram de rota ex: Itumbiara
+#filtros para pedidos que estão foram de rota ex: Itumbiara
+df_preventiva = df_preventiva.query(" `Cidade Cliente` != 'ITUMBIARA' ")
 
-df_preventiva = df_preventiva.query(" `Cidade Cliente ` !=  'ITUMBIARA' ")
 print("Cruzando os dados dos dois arquivos...", file=sys.stderr)
 df_resultado = pd.merge(df_preventiva, df_relatorio, left_on=COLUNA_CHAVE_PREVENTIVA, right_on=COLUNA_CHAVE_RELATORIO, how="left")
 

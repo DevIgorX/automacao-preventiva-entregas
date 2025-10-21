@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, url_for, Blueprint, current_app
 import os
 import subprocess
-import json # Importe a biblioteca JSON aqui também
+import json 
+import locale
 
 rotas = Blueprint('rotas', __name__)
 
@@ -25,9 +26,10 @@ def iniciar():
 
         diretorio_raiz_da_config = current_app.config['ROOT_DIR']
         caminho_analise = os.path.join(diretorio_raiz_da_config, 'analise', 'analise_entregas.py')
-        
+        #localizar o encoding padrão, utf-8 ou latim-1
+        encoding_padrao = locale.getpreferredencoding(False)
         # O resultado agora terá o JSON em stdout e os logs em stderr
-        resultado = subprocess.run(['python', caminho_analise], capture_output=True, text=True, encoding='utf-8')
+        resultado = subprocess.run(['python', caminho_analise], capture_output=True, text=True, encoding=encoding_padrao)
         
         # Se o script falhou, mostre o erro
         if resultado.returncode != 0:
