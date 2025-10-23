@@ -36,8 +36,8 @@ TEXTO_STATUS_DEVOLVIDO = "Mercadoria devolvida ao CD"
 # --- FIM DAS CONFIGURAÇÕES ---
 # ==============================================================================
 
-# ALTERAÇÃO: Mande os logs para stderr para não poluir a saída de dados
-print("Procurando os arquivos na pasta...", file=sys.stderr) 
+# ALTERAÇÃO: file=sys.stder muda a saida padrão do print que no caso seria no terminal, em vez disso envia para o canal de 'erro-padrao' ou sys.stderr
+print("Procurando os arquivos na pasta...", file=sys.stderr) #esse file faz parte de um paramentro da função print e que representa o destino da mensagem, no caso file=sys.stdout , ou seja o terminal
 nome_arquivo_preventiva_csv = None
 nome_arquivo_preventiva_excel = None
 nome_arquivo_relatorio = None
@@ -56,9 +56,9 @@ for nome_do_arquivo in os.listdir(caminho_dados):
         print(f"-> Arquivo de relatório encontrado: {nome_arquivo_relatorio}", file=sys.stderr)
 
 if not nome_arquivo_preventiva_csv and not nome_arquivo_preventiva_excel or not nome_arquivo_relatorio:
-    print("-" * 30, file=sys.stderr)
+    print("-" * 30, file=sys.stderr) #ele pega a string à esquerda "-" é multiplica 30 vezes formando um "-------------------------------------"
     print("ERRO: Um ou ambos os arquivos não foram encontrados na pasta.", file=sys.stderr)
-    exit()
+    exit() #exit para a execução do script imediatamente
 
 try:
     print("\nLendo a planilha de preventiva...", file=sys.stderr)
@@ -70,21 +70,21 @@ try:
     print("Lendo o relatório do Mobile Entregas...", file=sys.stderr)
     df_relatorio = pd.read_excel(nome_arquivo_relatorio)
     
-except Exception as e:
+except Exception as e: 
     print(f"Ocorreu um erro inesperado ao ler os arquivos: {e}", file=sys.stderr)
     exit()
 
-# --- O RESTANTE DO CÓDIGO PERMANECE O MESMO ---
+
 print("\nLimpando nomes das colunas...", file=sys.stderr)
 df_preventiva.columns = df_preventiva.columns.str.strip()
 df_relatorio.columns = df_relatorio.columns.str.strip()
 
 if COLUNA_CHAVE_PREVENTIVA not in df_preventiva.columns:
-    print(f"ERRO: A coluna '{COLUNA_CHAVE_PREVENTIVA}' não foi encontrada no arquivo de preventiva!", file=sys.stderr)
+    print(f"ERRO: A coluna '{COLUNA_CHAVE_PREVENTIVA}' não foi encontrada a coluna pedido_gemco no arquivo de preventiva!", file=sys.stderr)
     exit()
 
 if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
-    print(f"ERRO: A coluna '{COLUNA_CHAVE_RELATORIO}' não foi encontrada no relatório!", file=sys.stderr)
+    print(f"ERRO: A coluna '{COLUNA_CHAVE_RELATORIO}' não foi encontrada a coluna Pedido no relatório!", file=sys.stderr)
     exit()
 #filtros para pedidos que estão foram de rota ex: Itumbiara
 df_preventiva = df_preventiva.query(" `Cidade Cliente` != 'ITUMBIARA' ")
@@ -109,7 +109,9 @@ print(f"Gerando o arquivo de resultado: {output_filename}", file=sys.stderr)
 
 with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
     df_pendentes.to_excel(writer, sheet_name="Pendentes", index=False)
-    # ... você pode salvar as outras abas também se quiser
+    df_finalizados.to_excel(writer, sheet_name="Finalizados", index=False)
+    df_preventiva.to_excel(writer, sheet_name="Preventiva", index=False)
+ 
     
 # --- NOVA SEÇÃO PARA CRIAR A SAÍDA JSON ---
 
