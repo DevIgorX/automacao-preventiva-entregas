@@ -9,7 +9,7 @@ rotas = Blueprint('rotas', __name__)
 @rotas.route('/', methods=['GET', 'POST'])
 def iniciar():
     if request.method == 'POST':
-        # ... (seu código para checar e salvar os arquivos permanece o mesmo)
+        
         if 'preventiva' not in request.files or 'relatorio' not in request.files:
             return "Erro: Ambos os arquivos são necessários."
 

@@ -5,20 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Resultado da Análise</title>
-    <style>
-        .card-clickable {
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .card-clickable:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
-        .card-clickable.active {
-            border: 2px solid #0d6efd;
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
-        }
-    </style>
+    <link rel="stylesheet" href="{{url_for('static', filename='resultado.css')}}">
+    
 </head>
 <body>
     <div class="container mt-5">
@@ -68,7 +56,7 @@
 
         <div class="mb-4">
             <h5>Meta de Performance: {{ meta }}%</h5>
-            <div class="progress" style="height: 25px;">
+            <div class="progress" >
                 <div class="progress-bar {{ cor_performance }}" 
                     role="progressbar" style="width: {{ atual }}%;" 
                     aria-valuenow="{{ atual }}" aria-valuemin="0" aria-valuemax="100">
@@ -162,5 +150,7 @@
             setActiveCard(null); 
         });
     </script>
+
+    
 </body>
 </html>
