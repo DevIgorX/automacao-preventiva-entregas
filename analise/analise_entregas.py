@@ -26,6 +26,7 @@ caminho_saida = diretorio_raiz
 # --- CONFIGURAções E PADRÕES DE NOMES ---
 # ==============================================================================
 PADRAO_ARQUIVO_PREVENTIVA = "cd-etapa"
+PADRAO_ARQUIVO_PREVENTIVA_OP = "Relatorio_DOMICILIO"
 PADRAO_ARQUIVO_RELATORIO = "entregas"
 COLUNA_CHAVE_PREVENTIVA = "pedido_gemco"
 COLUNA_CHAVE_RELATORIO = "Pedido"
@@ -51,6 +52,10 @@ for nome_do_arquivo in os.listdir(caminho_dados):
     elif nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".xlsx"):
         nome_arquivo_preventiva_excel = caminho_arquivo
         print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}", file=sys.stderr)
+    elif nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA_OP) and nome_do_arquivo.endswith(".xlsx"):
+        nome_arquivo_preventiva_excel = caminho_arquivo
+        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}", file=sys.stderr)
+
     if PADRAO_ARQUIVO_RELATORIO in nome_do_arquivo and nome_do_arquivo.endswith(".xls"):
         nome_arquivo_relatorio = caminho_arquivo
         print(f"-> Arquivo de relatório encontrado: {nome_arquivo_relatorio}", file=sys.stderr)
