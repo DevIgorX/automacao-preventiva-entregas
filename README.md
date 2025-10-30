@@ -27,5 +27,5 @@ Use Python na versão 3.7+ com as bibliotecas:
 # Instale as dependências listadas no requirements.txt
 pip install pandas openpyxl xlrd flask
 
-# Executa o servidor de desenvolvimento do Flask
-python app/main.py
+# Como executa o servidor de desenvolvimento do Flask
+Na pasta raiz do projeto digite: python -m app.main
