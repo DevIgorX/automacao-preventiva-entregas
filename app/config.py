@@ -16,3 +16,8 @@ ROOT_DIR = diretorio_raiz
 GITKEEP = arquivo_gitkeep
 
 
+DEBUG = True
+
+
+
+

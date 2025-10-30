@@ -1,6 +1,6 @@
 from flask import  request, Blueprint
 
-from services import (iniciar_app , deletar_dados)
+from .services import iniciar_app , deletar_dados
 
 rotas = Blueprint('rotas', __name__)
 
