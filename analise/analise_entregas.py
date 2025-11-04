@@ -85,7 +85,7 @@ df_preventiva.columns = df_preventiva.columns.str.strip()
 df_relatorio.columns = df_relatorio.columns.str.strip()
 
 if COLUNA_CHAVE_PREVENTIVA not in df_preventiva.columns:
-    print(f"ERRO: A coluna '{COLUNA_CHAVE_PREVENTIVA}' não foi encontrada a coluna pedido_gemco no arquivo de preventiva!", file=sys.stderr)
+    print(f"ERRO: A coluna '{COLUNA_CHAVE_PREVENTIVA}' não foi encontrada a coluna PEDIDO 1P/FULL no arquivo de preventiva!", file=sys.stderr)
     exit()
 
 if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
