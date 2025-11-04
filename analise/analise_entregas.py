@@ -23,12 +23,12 @@ caminho_dados = os.path.join(diretorio_raiz, 'dados')
 caminho_saida = diretorio_raiz
 
 # ==============================================================================
-# --- CONFIGURAções E PADRÕES DE NOMES ---
+# --- CONFIGURAções E PADRÕES DE NOMES ----
 # ==============================================================================
 PADRAO_ARQUIVO_PREVENTIVA = "cd-etapa"
 PADRAO_ARQUIVO_PREVENTIVA_OP = "Relatorio_DOMICILIO"
 PADRAO_ARQUIVO_RELATORIO = "entregas"
-COLUNA_CHAVE_PREVENTIVA = "pedido_gemco"
+COLUNA_CHAVE_PREVENTIVA = "PEDIDO 1P/FULL"
 COLUNA_CHAVE_RELATORIO = "Pedido"
 COLUNA_STATUS = "Tipo"
 TEXTO_STATUS_ENTREGUE = "Entrega Realizada Normalmente"
@@ -121,7 +121,7 @@ with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
 # --- NOVA SEÇÃO PARA CRIAR A SAÍDA JSON ---
 
 # Define as colunas que queremos mostrar nas tabelas
-colunas_display = ['Cidade Cliente', 'pedido_gemco', 'Entregador', 'Tipo']
+colunas_display = ['Cidade Cliente', 'PEDIDO 1P/FULL', 'Entregador', 'Tipo']
 
 def preparar_df_para_json(df, colunas):
     """Função auxiliar para preparar o dataframe para a saída."""
