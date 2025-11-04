@@ -57,3 +57,7 @@ def deletar_dados():
         
    
     return redirect(url_for('rotas.iniciar'))
+
+
+def login():
+    return render_template('login.html')

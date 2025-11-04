@@ -1,6 +1,6 @@
 from flask import  request, Blueprint
 
-from .services import iniciar_app , deletar_dados
+from .services import iniciar_app , deletar_dados, login
 
 rotas = Blueprint('rotas', __name__)
 
@@ -18,4 +18,9 @@ def resultado():
 @rotas.route('/excluir_dados')
 def excluir_dados():
     return deletar_dados()
+
+
+@rotas.route('/login')
+def executar_login():
+    return login()
    
