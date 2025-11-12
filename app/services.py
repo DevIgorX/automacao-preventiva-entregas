@@ -29,18 +29,21 @@ def iniciar_app(request):
         # O resultado agora terá o JSON em stdout e os logs em stderr
         resultado = subprocess.run(['python', caminho_analise], capture_output=True, text=True, encoding=encoding_padrao)
         
-        # Se o script falhou, mostre o erro
+       # --- ESTA É A MUDANÇA PRINCIPAL ---
+        # Se o script falhou (returncode != 0), renderiza a página de erro
         if resultado.returncode != 0:
-            return f"<h1>Ocorreu um erro ao processar os arquivos:</h1><pre>{resultado.stderr}</pre>"
+            # O resultado.stderr conterá as mensagens de erro do seu script
+            return render_template('erro.html', erro=resultado.stderr)
         
         # Carrega a string JSON para um dicionário Python
         try:
             dados_analise = json.loads(resultado.stdout)
         except json.JSONDecodeError:
-            return f"<h1>Erro ao ler o resultado da análise.</h1><pre>Saída recebida: {resultado.stdout}</pre><pre>Logs: {resultado.stderr}</pre>"
+            # Se o JSON falhar, também renderiza a página de erro
+            mensagem_erro_json = f"Erro ao processar arquivo. \n\nLogs: {resultado.stderr}\n\nSaída: {resultado.stdout}"
+            return render_template('erro.html', erro=mensagem_erro_json)
 
-
-        # Em vez de redirecionar, renderiza a página de resultado diretamente com os dados
+        # Se tudo deu certo, mostra a página de resultado
         return render_template('resultado.html', data=dados_analise)
 
     # Se for GET, apenas mostra a página de upload

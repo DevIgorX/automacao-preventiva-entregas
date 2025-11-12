@@ -38,7 +38,7 @@ TEXTO_STATUS_DEVOLVIDO = "Mercadoria devolvida ao CD"
 # ==============================================================================
 
 # ALTERAÇÃO: file=sys.stder muda a saida padrão do print que no caso seria no terminal, em vez disso envia para o canal de 'erro-padrao' ou sys.stderr
-print("Procurando os arquivos na pasta...", file=sys.stderr) #esse file faz parte de um paramentro da função print e que representa o destino da mensagem, no caso file=sys.stdout , ou seja o terminal
+# print("Procurando os arquivos na pasta...", file=sys.stderr) #esse file faz parte de um paramentro da função print e que representa o destino da mensagem, no caso file=sys.stdout , ou seja o terminal
 nome_arquivo_preventiva_csv = None
 nome_arquivo_preventiva_excel = None
 nome_arquivo_relatorio = None
@@ -48,22 +48,31 @@ for nome_do_arquivo in os.listdir(caminho_dados):
     caminho_arquivo = os.path.join(caminho_dados, nome_do_arquivo)
     if nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".csv"):
         nome_arquivo_preventiva_csv = caminho_arquivo
-        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_csv}", file=sys.stderr)
+        # print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_csv}", file=sys.stderr)
     elif nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA) and nome_do_arquivo.endswith(".xlsx"):
         nome_arquivo_preventiva_excel = caminho_arquivo
-        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}", file=sys.stderr)
+        # print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}", file=sys.stderr)
     elif nome_do_arquivo.startswith(PADRAO_ARQUIVO_PREVENTIVA_OP) and nome_do_arquivo.endswith(".xlsx"):
         nome_arquivo_preventiva_excel = caminho_arquivo
-        print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}", file=sys.stderr)
+        # print(f"-> Arquivo de preventiva encontrado: {nome_arquivo_preventiva_excel}", file=sys.stderr)
+   
 
     if PADRAO_ARQUIVO_RELATORIO in nome_do_arquivo and nome_do_arquivo.endswith(".xls"):
         nome_arquivo_relatorio = caminho_arquivo
-        print(f"-> Arquivo de relatório encontrado: {nome_arquivo_relatorio}", file=sys.stderr)
+        # print(f"-> Arquivo de relatório encontrado: {nome_arquivo_relatorio}", file=sys.stderr)
+   
 
-if not nome_arquivo_preventiva_csv and not nome_arquivo_preventiva_excel or not nome_arquivo_relatorio:
+if not nome_arquivo_preventiva_csv and not nome_arquivo_preventiva_excel:
     print("-" * 30, file=sys.stderr) #ele pega a string à esquerda "-" é multiplica 30 vezes formando um "-------------------------------------"
-    print("ERRO: Um ou ambos os arquivos não foram encontrados na pasta.", file=sys.stderr)
+    print("ERRO: Arquivo de PREVENTIVA não encontrado.", file=sys.stderr)
+    print(f"O arquivo deve começar com '{PADRAO_ARQUIVO_PREVENTIVA}' ou '{PADRAO_ARQUIVO_PREVENTIVA_OP}' e ser .csv ou .xlsx.", file=sys.stderr)
     exit() #exit para a execução do script imediatamente
+
+if not nome_arquivo_relatorio:
+    print("-" * 30, file=sys.stderr)
+    print("ERRO: Arquivo de RELATÓRIO não encontrado.", file=sys.stderr)
+    print(f"O arquivo deve conter '{PADRAO_ARQUIVO_RELATORIO}' no nome e ser .xls.", file=sys.stderr)
+    exit()
 
 try:
     print("\nLendo a planilha de preventiva...", file=sys.stderr)
@@ -85,12 +94,17 @@ df_preventiva.columns = df_preventiva.columns.str.strip()
 df_relatorio.columns = df_relatorio.columns.str.strip()
 
 if COLUNA_CHAVE_PREVENTIVA not in df_preventiva.columns:
-    print(f"ERRO: A coluna '{COLUNA_CHAVE_PREVENTIVA}' não foi encontrada a coluna PEDIDO 1P/FULL no arquivo de preventiva!", file=sys.stderr)
+    print(f"ERRO: Arquivo de preventiva inválido!", file=sys.stderr)
+    print(f"O arquivo enviado não contém a coluna obrigatória: '{COLUNA_CHAVE_PREVENTIVA}'.", file=sys.stderr)
+    print("Por favor, verifique o arquivo e tente novamente.", file=sys.stderr)
     exit()
 
 if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
-    print(f"ERRO: A coluna '{COLUNA_CHAVE_RELATORIO}' não foi encontrada a coluna Pedido no relatório!", file=sys.stderr)
+    print(f"ERRO: Arquivo de relatório inválido!", file=sys.stderr)
+    print(f"O arquivo enviado não contém a coluna obrigatória: '{COLUNA_CHAVE_RELATORIO}'.", file=sys.stderr)
+    print("Por favor, verifique o arquivo e tente novamente.", file=sys.stderr)
     exit()
+
 #filtros para pedidos que estão foram de rota ex: Itumbiara
 df_preventiva = df_preventiva.query(" `Cidade Cliente` != 'ITUMBIARA' ")
 
