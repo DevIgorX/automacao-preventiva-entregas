@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, current_app
+from flask import render_template, redirect, url_for, current_app , send_from_directory
 import os
 import subprocess
 import json 
@@ -60,6 +60,19 @@ def deletar_dados():
         
    
     return redirect(url_for('rotas.iniciar'))
+
+
+# ADICIONE ESTA NOVA FUNÇÃO NO FINAL DO ARQUIVO:
+def baixar_relatorio():
+    # Pega o caminho da pasta 'dados' a partir da configuração
+    pasta_dados = current_app.config['UPLOAD_FOLDER']
+    
+    # Pega o nome do arquivo que o script de análise gera
+    nome_arquivo = 'Resultado_Monitoramento.xlsx'
+    
+    # Usa a função segura do Flask para enviar o arquivo
+    # as_attachment=True força o navegador a baixar o arquivo em vez de tentar exibi-lo
+    return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)
 
 
 def login():
