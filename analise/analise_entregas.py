@@ -133,7 +133,7 @@ df_performance = pd.DataFrame({
     "TOTAL": [total_pedidos], 
     "ENTREGUES": [pedidos_finalizados], 
     "INSUCESSO": [pedidos_pendentes] ,
-    "PERFORMANCE": [performance_atual] })
+    "PERFORMANCE": performance_atual })
 
 
 output_filename = os.path.join(caminho_dados, "Resultado_Monitoramento.xlsx")
