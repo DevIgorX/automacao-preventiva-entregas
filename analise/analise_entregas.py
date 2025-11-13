@@ -127,7 +127,7 @@ total_pedidos = len(df_preventiva)
 pedidos_finalizados = len(df_finalizados)
 pedidos_pendentes = len(df_pendentes)
 meta_performance =  meta_performance
-performance_atual = round(performance, 2)
+performance_atual = f'{round(performance, 2)}%'
 
 df_performance = pd.DataFrame({
     "TOTAL": [total_pedidos], 
