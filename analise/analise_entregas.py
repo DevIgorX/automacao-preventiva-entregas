@@ -123,6 +123,19 @@ df_finalizados = df_resultado[df_resultado[COLUNA_STATUS].isin([TEXTO_STATUS_ENT
 performance = (len(df_finalizados) / len(df_preventiva)) * 100 if len(df_preventiva) > 0 else 0
 meta_performance = 96.00
 
+total_pedidos = len(df_preventiva)
+pedidos_finalizados = len(df_finalizados)
+pedidos_pendentes = len(df_pendentes)
+meta_performance =  meta_performance
+performance_atual = round(performance, 2)
+
+df_performance = pd.DataFrame({
+    "TOTAL": [total_pedidos], 
+    "ENTREGUES": [pedidos_finalizados], 
+    "INSUCESSO": [pedidos_pendentes] ,
+    "PERFORMANCE": [performance_atual] })
+
+
 output_filename = os.path.join(caminho_dados, "Resultado_Monitoramento.xlsx")
 print(f"Gerando o arquivo de resultado: {output_filename}", file=sys.stderr)
 
@@ -130,6 +143,7 @@ with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
     df_pendentes.to_excel(writer, sheet_name="Pendentes", index=False)
     df_finalizados.to_excel(writer, sheet_name="Finalizados", index=False)
     df_preventiva.to_excel(writer, sheet_name="Preventiva", index=False)
+    df_performance.to_excel(writer, sheet_name="Performance",index=False)
  
     
 # --- NOVA SEÇÃO PARA CRIAR A SAÍDA JSON ---
