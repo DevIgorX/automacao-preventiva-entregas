@@ -16,3 +16,38 @@
 .progress {
     height: 25px 
 }
+
+/*alteração feita aqui
+
+
+/* Estilo para o ícone de filtro no cabeçalho da tabela */
+.filter-icon {
+    cursor: pointer;
+    color: #adb5bd; /* Cinza claro */
+    transition: color 0.2s;
+}
+
+.filter-icon:hover, .filter-icon.active {
+    color: #ffffff; /* Branco quando ativo ou hover */
+}
+
+/* Ajuste para o menu dropdown do filtro não sumir */
+.filter-dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 250px;
+    padding: 10px;
+}
+
+/* Estilo da label do checkbox dentro do filtro */
+.filter-option {
+    display: block;
+    padding: 3px 0;
+    cursor: pointer;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
