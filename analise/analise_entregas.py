@@ -93,6 +93,44 @@ print("\nLimpando nomes das colunas...", file=sys.stderr)
 df_preventiva.columns = df_preventiva.columns.str.strip()
 df_relatorio.columns = df_relatorio.columns.str.strip()
 
+# ==============================================================================
+# --- NOVA VALIDAÇÃO: PREENCHER PEDIDO VAZIO COM PEDIDO CLIENTE + "-1" ---
+# ==============================================================================
+print("Validando e corrigindo coluna de Pedidos...", file=sys.stderr)
+
+# 1. Garante que as colunas sejam tratadas como texto para evitar erros
+# O astype(str) previne erro se o pandas leu como número
+df_relatorio['Pedido'] = df_relatorio['Pedido'].astype(str).replace('nan', '')
+df_relatorio['Pedido Cliente'] = df_relatorio['Pedido Cliente'].astype(str).replace('nan', '')
+
+def corrigir_pedido(row):
+    pedido_atual = row['Pedido']
+    pedido_cliente = row['Pedido Cliente']
+    
+    # Verifica se o pedido está vazio, nulo ou é apenas espaço em branco
+    if not pedido_atual or pedido_atual.strip() == '' or pedido_atual.lower() == 'nan':
+        # Remove '.0' caso o pandas tenha lido o Pedido Cliente como float (ex: 12345.0)
+        if pedido_cliente.endswith('.0'):
+            pedido_cliente = pedido_cliente[:-2]
+            
+        return f"{pedido_cliente}-1"
+    
+    # Se já tiver pedido, remove o '.0' caso exista e retorna ele mesmo
+    if pedido_atual.endswith('.0'):
+        return pedido_atual[:-2]
+        
+    return pedido_atual
+
+# Aplica a função linha a linha (axis=1)
+df_relatorio['Pedido'] = df_relatorio.apply(corrigir_pedido, axis=1)
+
+# Garante que a coluna chave da preventiva também esteja limpa de '.0' e seja string
+df_preventiva[COLUNA_CHAVE_PREVENTIVA] = df_preventiva[COLUNA_CHAVE_PREVENTIVA].astype(str).str.replace('.0', '', regex=False)
+
+# ==============================================================================
+# --- FIM DA NOVA VALIDAÇÃO ---
+# ==============================================================================
+
 if COLUNA_CHAVE_PREVENTIVA not in df_preventiva.columns:
     print(f"ERRO: Arquivo de preventiva inválido!", file=sys.stderr)
     print(f"O arquivo enviado não contém a coluna obrigatória: '{COLUNA_CHAVE_PREVENTIVA}'.", file=sys.stderr)
