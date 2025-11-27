@@ -106,7 +106,7 @@ if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
     exit()
 
 #filtros para pedidos que estão foram de rota ex: Itumbiara
-df_preventiva = df_preventiva.query(" `Cidade Cliente` != 'ITUMBIARA' ")
+df_preventiva = df_preventiva[df_preventiva['Cidade Cliente'] != 'ITUMBIARA']
 
 print("Cruzando os dados dos dois arquivos...", file=sys.stderr)
 df_resultado = pd.merge(df_preventiva, df_relatorio, left_on=COLUNA_CHAVE_PREVENTIVA, right_on=COLUNA_CHAVE_RELATORIO, how="left")
