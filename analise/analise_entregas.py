@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import json
 import sys
+import re # Importando biblioteca de expressões regulares
 
 # ==============================================================================
 # --- CONFIGURAÇÕES DE DIRETÓRIOS ---
@@ -12,13 +13,11 @@ diretorio_raiz = os.path.dirname(diretorio_analise)
 caminho_dados = os.path.join(diretorio_raiz, 'dados')
 
 # ==============================================================================
-# --- COLUNAS CHAVE PARA IDENTIFICAÇÃO (A "DIGITAL" DO ARQUIVO) ---
+# --- COLUNAS CHAVE PARA IDENTIFICAÇÃO ---
 # ==============================================================================
-# O sistema vai procurar por estas colunas para saber quem é quem
 COLUNA_IDENTIFICADORA_PREVENTIVA = "PEDIDO 1P/FULL"
 COLUNA_IDENTIFICADORA_RELATORIO = "Pedido"
 
-# Outras configurações
 TEXTO_STATUS_ENTREGUE = "Entrega Realizada Normalmente"
 TEXTO_STATUS_DEVOLVIDO = "Mercadoria devolvida ao CD"
 
@@ -38,69 +37,60 @@ for arquivo in arquivos_na_pasta:
     caminho_completo = os.path.join(caminho_dados, arquivo)
     df_temp = None
     
-    # 1. Tenta ler o arquivo (seja CSV ou Excel)
     try:
         if arquivo.lower().endswith('.csv'):
-            # Tenta ler CSV com separador de tabulação e depois ponto e vírgula se falhar
             try:
                 df_temp = pd.read_csv(caminho_completo, sep='\t', encoding='latin-1')
-                if len(df_temp.columns) <= 1: # Se leu tudo numa coluna só, tenta outro separador
+                if len(df_temp.columns) <= 1: 
                     df_temp = pd.read_csv(caminho_completo, sep=';', encoding='latin-1')
             except:
-                continue # Pula se der erro grave na leitura
+                continue 
                 
         elif arquivo.lower().endswith(('.xlsx', '.xls')):
             df_temp = pd.read_excel(caminho_completo)
         else:
-            continue # Pula arquivos que não são planilhas
+            continue 
             
     except Exception as e:
         print(f"Alerta: Não consegui ler o arquivo {arquivo}. Motivo: {e}", file=sys.stderr)
         continue
 
-    # 2. Limpa os nomes das colunas para evitar erros com espaços extras
     if df_temp is not None:
         df_temp.columns = df_temp.columns.str.strip()
 
-        # 3. VERIFICAÇÃO DE IDENTIDADE
-        # Se tem a coluna chave da preventiva e a variável ainda está vazia
         if COLUNA_IDENTIFICADORA_PREVENTIVA in df_temp.columns and df_preventiva is None:
             df_preventiva = df_temp
             nome_preventiva_encontrado = arquivo
             print(f"-> IDENTIFICADO: Preventiva encontrada no arquivo '{arquivo}'", file=sys.stderr)
         
-        # Se tem a coluna chave do relatório e a variável ainda está vazia
         elif COLUNA_IDENTIFICADORA_RELATORIO in df_temp.columns and df_relatorio is None:
             df_relatorio = df_temp
             nome_relatorio_encontrado = arquivo
             print(f"-> IDENTIFICADO: Relatório Mobile encontrado no arquivo '{arquivo}'", file=sys.stderr)
 
 # ==============================================================================
-# --- VALIDAÇÃO SE ENCONTROU TUDO ---
+# --- VALIDAÇÃO ---
 # ==============================================================================
 if df_preventiva is None:
     print("-" * 30, file=sys.stderr)
     print("ERRO CRÍTICO: Arquivo de PREVENTIVA não identificado.", file=sys.stderr)
-    print(f"Procurei em todos os arquivos por uma coluna chamada '{COLUNA_IDENTIFICADORA_PREVENTIVA}', mas não achei.", file=sys.stderr)
-    print("Verifique se o arquivo enviado está correto.", file=sys.stderr)
     exit(1)
 
 if df_relatorio is None:
     print("-" * 30, file=sys.stderr)
     print("ERRO CRÍTICO: Arquivo de RELATÓRIO DE ENTREGAS não identificado.", file=sys.stderr)
-    print(f"Procurei em todos os arquivos por uma coluna chamada '{COLUNA_IDENTIFICADORA_RELATORIO}', mas não achei.", file=sys.stderr)
     exit(1)
 
 # ==============================================================================
-# --- TRATAMENTO E CRUZAMENTO (Lógica de Negócio) ---
+# --- TRATAMENTO DE DADOS (Lógica Nova Aqui) ---
 # ==============================================================================
 print("Validando e padronizando dados...", file=sys.stderr)
 
-# Padronização de Pedidos (Mesma lógica robusta de antes)
+# --- 1. Tratamento do Relatório Mobile (Mantido) ---
 df_relatorio['Pedido'] = df_relatorio['Pedido'].astype(str).replace('nan', '')
 df_relatorio['Pedido Cliente'] = df_relatorio['Pedido Cliente'].astype(str).replace('nan', '')
 
-def corrigir_pedido(row):
+def corrigir_pedido_relatorio(row):
     pedido_atual = row['Pedido']
     pedido_cliente = row['Pedido Cliente']
     
@@ -113,18 +103,40 @@ def corrigir_pedido(row):
         return pedido_atual[:-2]
     return pedido_atual
 
-df_relatorio['Pedido'] = df_relatorio.apply(corrigir_pedido, axis=1)
+df_relatorio['Pedido'] = df_relatorio.apply(corrigir_pedido_relatorio, axis=1)
+
+# --- 2. Tratamento da Preventiva (NOVA LÓGICA PEDIDA) ---
+# Primeiro removemos '.0' se houver
 df_preventiva[COLUNA_IDENTIFICADORA_PREVENTIVA] = df_preventiva[COLUNA_IDENTIFICADORA_PREVENTIVA].astype(str).str.replace('.0', '', regex=False)
 
-# Filtro de Cidade (Usando 'Cidade Cliente' conforme seu Excel)
+def padronizar_preventiva(pedido):
+    pedido = str(pedido).strip()
+    
+    # Verifica se tem mais de 10 digitos
+    if len(pedido) > 10:
+        # Regex para encontrar padrão final "-X" onde X é um dígito
+        # Se terminar com -2, -3, -4 etc, substituímos por -1
+        if re.search(r'-\d+$', pedido):
+            # Se já terminar com -1, mantemos. Se for diferente, trocamos.
+            if not pedido.endswith('-1'):
+                # Corta o sufixo antigo e adiciona -1
+                base = pedido.rsplit('-', 1)[0]
+                return f"{base}-1"
+    
+    return pedido
+
+# Aplica a nova função na coluna da preventiva
+df_preventiva[COLUNA_IDENTIFICADORA_PREVENTIVA] = df_preventiva[COLUNA_IDENTIFICADORA_PREVENTIVA].apply(padronizar_preventiva)
+
+
+# Filtro de Cidade
 if 'Cidade Cliente' in df_preventiva.columns:
-    df_preventiva = df_preventiva[df_preventiva['Cidade Cliente'] != 'ITUMBIARA']
+    df_preventiva = df_preventiva[df_preventiva['cidade_cliente'] != 'ITUMBIARA']
 else:
-    # Fallback caso a coluna mude de nome, tenta achar algo parecido ou avisa
-    print("Aviso: Coluna 'Cidade Cliente' não encontrada para filtrar Itumbiara. Ignorando filtro.", file=sys.stderr)
+    print("Aviso: Coluna 'cidade_cliente' não encontrada. Ignorando filtro.", file=sys.stderr)
 
 print("Cruzando as informações...", file=sys.stderr)
-# Cruzamento (Merge)
+
 df_resultado = pd.merge(
     df_preventiva, 
     df_relatorio, 
@@ -134,9 +146,8 @@ df_resultado = pd.merge(
 )
 
 # Separação por Status
-coluna_status = "Tipo" # Nome da coluna no relatório mobile
+coluna_status = "Tipo"
 if coluna_status not in df_resultado.columns:
-     # Cria a coluna vazia se não existir para não quebrar o código
     df_resultado[coluna_status] = 'Sem Status'
 
 pendentes_mask = (
@@ -146,16 +157,16 @@ pendentes_mask = (
 )
 
 df_pendentes = df_resultado[pendentes_mask]
-df_finalizados = df_resultado[~pendentes_mask] # O inverso da máscara de pendentes
+df_finalizados = df_resultado[~pendentes_mask]
 
-# Cálculos de Performance
+# Cálculos
 total_pedidos = len(df_preventiva)
 pedidos_finalizados = len(df_finalizados)
 pedidos_pendentes = len(df_pendentes)
 performance = (pedidos_finalizados / total_pedidos) * 100 if total_pedidos > 0 else 0
 meta_performance = 96.00
 
-# Geração do Excel de Saída
+# Geração do Excel
 output_filename = os.path.join(caminho_dados, "Resultado_Monitoramento.xlsx")
 print(f"Gerando relatório final em: {output_filename}", file=sys.stderr)
 
@@ -172,10 +183,7 @@ with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
     df_preventiva.to_excel(writer, sheet_name="Preventiva", index=False)
     df_performance.to_excel(writer, sheet_name="Performance", index=False)
 
-# ==============================================================================
-# --- GERAÇÃO DO JSON PARA O FRONTEND ---
-# ==============================================================================
-# Atenção: Usamos 'Cidade Cliente' aqui. Se o seu HTML usar 'cidade_cliente', altere o HTMLs
+# JSON para Frontend
 colunas_display = ['cidade_cliente', 'PEDIDO 1P/FULL', 'Entregador', 'Tipo']
 
 def preparar_dados(df):
