@@ -144,7 +144,7 @@ if COLUNA_CHAVE_RELATORIO not in df_relatorio.columns:
     exit()
 
 #filtros para pedidos que estão foram de rota ex: Itumbiara
-df_preventiva = df_preventiva[df_preventiva['Cidade Cliente'] != 'ITUMBIARA']
+df_preventiva = df_preventiva[df_preventiva['cidade cliente'] != 'ITUMBIARA']
 
 print("Cruzando os dados dos dois arquivos...", file=sys.stderr)
 df_resultado = pd.merge(df_preventiva, df_relatorio, left_on=COLUNA_CHAVE_PREVENTIVA, right_on=COLUNA_CHAVE_RELATORIO, how="left")
@@ -187,7 +187,7 @@ with pd.ExcelWriter(output_filename, engine='openpyxl') as writer:
 # --- NOVA SEÇÃO PARA CRIAR A SAÍDA JSON ---
 
 # Define as colunas que queremos mostrar nas tabelas
-colunas_display = ['Cidade Cliente', 'PEDIDO 1P/FULL', 'Entregador', 'Tipo']
+colunas_display = ['cidade cliente', 'PEDIDO 1P/FULL', 'Entregador', 'Tipo']
 
 def preparar_df_para_json(df, colunas):
     """Função auxiliar para preparar o dataframe para a saída."""
