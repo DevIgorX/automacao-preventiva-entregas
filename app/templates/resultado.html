@@ -263,7 +263,7 @@
 
             // Filtra os dados
             currentFilteredData = currentRawData.filter(item => {
-                const cidadeMatch = activeFilters['Cidade Cliente'].includes(item['Cidade Cliente'] || 'Vazio');
+                const cidadeMatch = activeFilters['cidade_cliente'].includes(item['cidade_cliente'] || 'Vazio');
                 const entregadorMatch = activeFilters['Entregador'].includes(item['Entregador'] || 'Vazio');
                 const statusMatch = activeFilters['Tipo'].includes(item['Tipo'] || 'Vazio');
                 
