@@ -130,7 +130,7 @@ df_preventiva[COLUNA_IDENTIFICADORA_PREVENTIVA] = df_preventiva[COLUNA_IDENTIFIC
 
 
 # Filtro de Cidade
-if 'Cidade Cliente' in df_preventiva.columns:
+if 'Cidade Cliente' in df_preventiva.columns or 'cidade_cliente' in df_preventiva.columns:
     df_preventiva = df_preventiva[df_preventiva['cidade_cliente'] != 'ITUMBIARA']
 else:
     print("Aviso: Coluna 'cidade_cliente' não encontrada. Ignorando filtro.", file=sys.stderr)
