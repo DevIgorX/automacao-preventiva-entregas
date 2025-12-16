@@ -4,4 +4,8 @@ openpyxl
 xlrd
 waitress
 python-dotenv
+flask_sqlalchemy
+flask_wtf
+
+
 
