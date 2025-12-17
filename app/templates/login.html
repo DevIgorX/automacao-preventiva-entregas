@@ -12,18 +12,25 @@
     </div>
 
     <form method="POST" action="#">
+      {{form.csrf_token()}}
       <div class="mb-3">
-        <label class="form-label fw-semibold">Usuário</label>
-        <input type="text" name="usuario" class="form-control form-control-lg" placeholder="Digite seu usuário" required>
+        {{form.nome.label(class="form-label fw-semibold")}}
+        {{form.nome(class="form-control form-control-lg")}}
+        <!-- <label class="form-label fw-semibold">Usuário</label>
+        <input type="text" name="usuario" class="form-control form-control-lg" placeholder="Digite seu usuário" required> -->
       </div>
 
       <div class="mb-3">
-        <label class="form-label fw-semibold">Senha</label>
+
+        {{form.senha.label(class="form-label fw-semibold")}}
+        {{form.senha(class="form-control form-control-lg")}}
+        <!-- <label class="form-label fw-semibold">Senha</label>
         <input type="password" name="senha" class="form-control form-control-lg" placeholder="Digite sua senha" required>
-      </div>
+      </div> -->
 
       <div class="d-grid">
-        <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
+        {{form.entrar(class="btn btn-primary btn-lg")}}
+        <!-- <button type="submit" class="btn btn-primary btn-lg">Entrar</button> -->
       </div>
 
       <div class="text-center mt-3">
