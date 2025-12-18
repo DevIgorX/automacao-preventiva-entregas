@@ -51,3 +51,63 @@
     justify-content: space-between;
     align-items: center;
 }
+
+
+.btn-gradient-excel {
+    background: linear-gradient(135deg, #21a366 0%, #185a37 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px; /* Mais "gordinho" */
+    border-radius: 50px; /* Borda pílula */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(33, 163, 102, 0.3); /* Sombra verde */
+}
+
+.btn-gradient-excel:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(33, 163, 102, 0.5); /* Sombra aumenta */
+    background: linear-gradient(135deg, #26bd76 0%, #1D6F42 100%);
+}
+
+.btn-gradient-secondary {
+    /* Gradiente "Titânio" (Cinza com toque azulado) */
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    border: none;
+    padding: 10px 24px; /* Mesmo tamanho do botão Excel */
+    border-radius: 50px; /* Borda pílula */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3); /* Sombra cinza */
+}
+
+.btn-gradient-secondary:hover {
+    color: white;
+    transform: translateY(-2px);
+    /* Sombra mais forte no hover */
+    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.5); 
+    background: linear-gradient(135deg, #7e8992 0%, #343a40 100%);
+}
+
+/* Garante que o link não tenha sublinhado */
+.btn-gradient-secondary, .btn-gradient-secondary:hover {
+    text-decoration: none;
+}
+
+/* Barra de ações (Botões de Exportar/Novo) */
+.card-actions {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px); /* Efeito de vidro fosco opcional */
+    border: none; /* Substitui o border-0 do Bootstrap */
+    border-radius: 1rem; /* Opcional: arredonda as bordas do card */
+}

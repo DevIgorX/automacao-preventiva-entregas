@@ -8,11 +8,18 @@
             <h1 class="text-primary">Resultado da Análise</h1>
 
             <div>
-                <a href="{{ url_for('rotas.download_relatorio_excel') }}" class="btn btn-success">
-                    <i class="bi bi-download"></i> Baixar Relatório (.xlsx)
-                </a>
                 
-                <a href="{{url_for('rotas.excluir_dados')}}" class="btn btn-secondary">Analisar Outros Arquivos</a>
+                    <a href="{{ url_for('rotas.download_relatorio_excel') }}" 
+                      class="btn btn-gradient-excel shadow-lg">
+                      <i class="bi bi-download"></i>
+                      <span>Exportar Excel</span>
+                    </a>
+                
+                    <a href="{{url_for('rotas.excluir_dados')}}" 
+                     class="btn btn-gradient-secondary shadow-lg">
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                      <span>Nova Análise</span>
+                    </a>
             </div>
         </div>
 

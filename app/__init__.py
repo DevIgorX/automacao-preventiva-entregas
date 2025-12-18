@@ -9,7 +9,8 @@ def create_app():
     # Carrega configurações
     app.config.from_pyfile('config.py')
 
-    crsf.init_app(app)
+    # crsf.init_app(app)
+    app.config['WTF_CSRF_ENABLED'] = False
     # Registra os blueprints
     app.register_blueprint(rotas)
 
