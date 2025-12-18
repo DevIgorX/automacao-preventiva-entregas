@@ -3,7 +3,7 @@ import os
 import subprocess
 import json 
 import locale
-# from helpers import FormularioLogin
+from .helpers import FormularioLogin
 
 
 def iniciar_app(request):
@@ -76,7 +76,7 @@ def baixar_relatorio():
     return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)
 
 
-# def login():
+def login():
 
-#     form = FormularioLogin()
-#     return render_template('login.html', form=form)
+    form = FormularioLogin()
+    return render_template('login.html', form=form)
