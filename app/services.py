@@ -80,3 +80,15 @@ def login():
 
     form = FormularioLogin()
     return render_template('login.html', form=form)
+
+def pagina_analise_preventiva():
+    pasta_dados = current_app.config['UPLOAD_FOLDER']
+
+    arquivos_no_servidor = []
+
+    if os.path.exists(pasta_dados):
+        for arquivo in os.listdir(pasta_dados):
+            if arquivo != '.gitkeep':
+                arquivos_no_servidor.append(arquivo)
+
+    return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
