@@ -1,6 +1,6 @@
 from flask import  request, Blueprint
 
-from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva
+from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_dados, analisar_dados
 
 rotas = Blueprint('rotas', __name__)
 
@@ -33,4 +33,11 @@ def download_relatorio_excel():
 @rotas.route('/pagina_analise')
 def pagina_analise():
     return pagina_analise_preventiva()
+
+@rotas.route('/adicionar_dados', methods=['POST'])
+def adicionar_dados():
+    return adicionar_dados(request)
    
+@rotas.route('/analisar_dados')
+def analisar_dados():
+    return analisar_dados(request)

@@ -1,9 +1,10 @@
-from flask import render_template, redirect, url_for, current_app , send_from_directory
+from flask import render_template, redirect, url_for, current_app , send_from_directory, flash
 import os
 import subprocess
 import json 
 import locale
 from .helpers import FormularioLogin
+from db.db_preventiva import buscar_dados_paginados
 
 
 def iniciar_app(request):
@@ -92,3 +93,61 @@ def pagina_analise_preventiva():
                 arquivos_no_servidor.append(arquivo)
 
     return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
+
+
+def adicionar_dados(request):
+    arquivos = request.files.getlist('arquivos')
+
+    if not arquivos:
+        flash("Nenhum arquivo enviado!","danger")
+        return redirect(url_for('rotas.pagina_analise'))
+
+    pasta_dados = current_app.config['UPLOAD_FOLDER']
+
+    arquivos_pulados = []
+    for arquivo in arquivos:
+        caminho_completo = os.path.join(pasta_dados, arquivo.filename)
+
+        if os.path.exists(caminho_completo):
+            arquivos_pulados.append(caminho_completo)
+            continue
+
+        arquivo.save(caminho_completo)
+    
+    if arquivos_pulados:
+        flash(f"Atenção! O arquivo já estava no servidor e foi ignorado: {', '.join(arquivos_pulados)}", "warning") # flash(mensagem, categoria)"warning" → cor amarelo (atenção)
+    else:
+        flash("Arquivo enviado com sucesso!", "success") #success cor verde
+    
+    return redirect(url_for('rotas.pagina_analise'))
+
+
+def analisar_dados(request):
+    pagina = request.args.get('pagina', 1, type=int)
+    processar = request.args.get('processar', 'false') == 'true'
+
+    # Só roda o script de análise se o usuário clicou no botão pela primeira vez
+    if processar:
+        diretorio_raiz = current_app.config['ROOT_DIR']
+        pasta_analise = os.path.join(diretorio_raiz, 'analise') 
+        caminho_script = os.path.join(pasta_analise, 'analise_preventiva.py')
+        enconding_padro = locale.getpreferredencoding(False)
+        
+        # Roda a análise (que agora salva no banco)
+        subprocess.run(['python', caminho_script], capture_output=True, text=True, encoding=enconding_padro)
+
+    # Busca os dados do banco (seja após o processamento ou apenas mudando de página)
+    itens_por_pg = 7
+    lista_dados, total_itens = buscar_dados_paginados(pagina, itens_por_pg)
+    
+    total_paginas = (total_itens + itens_por_pg - 1) // itens_por_pg
+
+    dados_formatados = {
+        "Excel": lista_dados,
+        "pagina_atual": pagina,
+        "total_paginas": total_paginas
+    }
+
+    return render_template('tabela_resultado.html', dados=dados_formatados)
+        
+       
