@@ -3,7 +3,12 @@ import pandas as pd
 import os
 
 # Caminho para o banco de dados na raiz do projeto
-DB_PATH = 'dados_preventiva.db'
+caminho_script = os.path.abspath(__file__)
+pasta_db = os.path.dirname(caminho_script)
+diretorio_raiz = os.path.dirname(pasta_db)
+pasta_app = os.path.join(diretorio_raiz,'app')
+diretorio_db = os.path.join(pasta_app,'dados_preventiva.db')
+DB_PATH = diretorio_db
 
 def salvar_no_banco(df, nome_tabela="analise_resultado"):
     """Salva o DataFrame no SQLite, sobrescrevendo a tabela anterior."""

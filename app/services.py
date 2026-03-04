@@ -3,6 +3,7 @@ import os
 import subprocess
 import json 
 import locale
+from datetime import datetime
 from .helpers import FormularioLogin
 from db.db_preventiva import buscar_dados_paginados
 
@@ -95,7 +96,7 @@ def pagina_analise_preventiva():
     return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
 
 
-def adicionar_dados(request):
+def adicionar_arquivo(request):
     arquivos = request.files.getlist('arquivos')
 
     if not arquivos:
@@ -122,7 +123,7 @@ def adicionar_dados(request):
     return redirect(url_for('rotas.pagina_analise'))
 
 
-def analisar_dados(request):
+def analisar_preventiva(request):
     pagina = request.args.get('pagina', 1, type=int)
     processar = request.args.get('processar', 'false') == 'true'
 
@@ -149,5 +150,21 @@ def analisar_dados(request):
     }
 
     return render_template('tabela_resultado.html', dados=dados_formatados)
-        
+
+def excluir_arquivos():
+    pasta_dados = current_app.config['UPLOAD_FOLDER']
+
+    for arquivo in os.listdir(pasta_dados):
+        caminho_arquivo = os.path.join(pasta_dados, arquivo)
+        if arquivo != '.gitkeep':
+            os.remove(caminho_arquivo)
+    
+    return redirect(url_for('rotas.pagina_analise'))
        
+def baixar_preventiva():
+    pasta_dados = current_app.config['UPLOAD_FOLDER']
+
+    data_hoje = datetime.today().strftime('%d-%m-%Y')
+    nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
+
+    return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)

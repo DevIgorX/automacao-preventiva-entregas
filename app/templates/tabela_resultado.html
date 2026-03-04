@@ -17,12 +17,12 @@
         
             <div class="d-flex gap-2">
         
-                <a href="{{ url_for('rotas.deletar_arquivos') }}"
+                <a href="{{ url_for('rotas.limpar_arquivo') }}"
                     class="btn btn-outline-primary shadow-sm">
                     <i class="fas fa-arrow-left me-1"></i> Nova Análise
                 </a>
         
-                <a href="{{ url_for('rotas.baixar_relatorio') }}"
+                <a href="{{ url_for('rotas.baixar_relatorio_preventiva') }}"
                     class="btn btn-success shadow-sm">
                     <i class="fas fa-file-excel me-1"></i> Exportar Excel
                 </a>
@@ -61,7 +61,7 @@
                 <div class="alert alert-warning mt-3">Nenhum dado encontrado no cruzamento.</div>
                 {% endif %}
 
-                <a href="{{url_for('rotas.deletar_arquivos')}}" class="btn btn-primary mt-3">Voltar</a>
+                <a href="{{url_for('rotas.limpar_arquivo')}}" class="btn btn-primary mt-3">Voltar</a>
 
                 <nav class="mt-4">
                     <ul class="pagination justify-content-center">
