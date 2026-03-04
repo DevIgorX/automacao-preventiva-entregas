@@ -125,21 +125,26 @@ def adicionar_arquivo(request):
 
 def analisar_preventiva(request):
     pagina = request.args.get('pagina', 1, type=int)
-    processar = request.args.get('processar', 'false') == 'true'
+    processar = request.args.get('processar', 'false').lower() == 'true'
 
-    # Só roda o script de análise se o usuário clicou no botão pela primeira vez
     if processar:
         diretorio_raiz = current_app.config['ROOT_DIR']
         pasta_analise = os.path.join(diretorio_raiz, 'analise') 
         caminho_script = os.path.join(pasta_analise, 'analise_preventiva.py')
-        enconding_padro = locale.getpreferredencoding(False)
+        encoding_padrao = locale.getpreferredencoding(False)
         
-        # Roda a análise (que agora salva no banco)
-        subprocess.run(['python', caminho_script], capture_output=True, text=True, encoding=enconding_padro)
+       
+        resultado = subprocess.run(['python', caminho_script], capture_output=True, text=True, encoding=encoding_padrao)
 
-    # Busca os dados do banco (seja após o processamento ou apenas mudando de página)
+        if resultado.returncode != 0:
+            return render_template('erro.html', erro=resultado.stderr)
+
     itens_por_pg = 7
-    lista_dados, total_itens = buscar_dados_paginados(pagina, itens_por_pg)
+    try:
+        lista_dados, total_itens = buscar_dados_paginados(pagina, itens_por_pg)
+    except Exception as e:
+        
+        return render_template('erro.html', erro=f"Erro ao buscar dados: {e}")
     
     total_paginas = (total_itens + itens_por_pg - 1) // itens_por_pg
 
