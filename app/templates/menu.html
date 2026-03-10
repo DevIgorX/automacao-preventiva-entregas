@@ -1,0 +1,27 @@
+{% extends "base_template.html" %}
+{% block content %}
+<div class="container text-center mt-5">
+    <h1>Bem-vindo ao Sistema Porta-a-Porta</h1>
+    <p class="lead">Selecione a operação desejada:</p>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Análise de Performance</h5>
+                    <p>Upload de arquivos "Preventiva" e "Mobile" para gerar relatorio.</p>
+                    <a href="{{ url_for('rotas.analise_performance') }}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Análise Preventiva</h5>
+                    <p>Execução do script de cruzamento de dados via Planilhas.</p>
+                    <a href="{{ url_for('rotas.pagina_analise') }}" class="btn btn-success">Acessar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,23 @@
-from flask import  request, Blueprint
+from flask import  request, Blueprint, render_template
 
 from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva
 
 rotas = Blueprint('rotas', __name__)
 
-@rotas.route('/', methods=['GET', 'POST'])
-def iniciar():
+
+# @rotas.route('/')
+# def menu_principal():
+#     return render_template('menu.html')
+
+@rotas.route('/')
+def pagina_inicial():
+    return render_template('dashboard.html')
+
+@rotas.route('/performance', methods=['GET', 'POST'])
+def analise_performance():
     return iniciar_app(request)
- 
+
+
 # Esta rota agora é opcional, mas podemos mantê-la para o caso de acesso direto
 @rotas.route('/resultado')
 def resultado():

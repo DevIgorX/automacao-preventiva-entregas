@@ -1,0 +1,39 @@
+{% extends "base_corporativo.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Página Inicial</h1>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded p-3 me-3">
+                        <i class="bi bi-graph-up-arrow h3 m-0"></i>
+                    </div>
+                    <h5 class="card-title m-0">Análise de Performance</h5>
+                </div>
+                <p class="card-text">Upload de arquivos "Preventiva" e "Mobile" para KPIs em tempo real.</p>
+                <a href="{{ url_for('rotas.analise_performance') }}" class="btn btn-primary w-100">Acessar Módulo</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-success text-white rounded p-3 me-3">
+                        <i class="bi bi-file-earmark-diff h3 m-0"></i>
+                    </div>
+                    <h5 class="card-title m-0">Análise Preventiva Completa</h5>
+                </div>
+                <p class="card-text">Execução do script de cruzamento de dados via Dataframes (Mobile, Magalu, Bipe, Carreta).</p>
+                <a href="{{ url_for('rotas.pagina_analise') }}" class="btn btn-success w-100">Executar Script</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

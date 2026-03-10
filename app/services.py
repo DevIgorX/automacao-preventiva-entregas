@@ -62,7 +62,7 @@ def deletar_dados():
         
         
    
-    return redirect(url_for('rotas.iniciar'))
+    return redirect(url_for('rotas.analise_performance'))
 
 
 # ADICIONE ESTA NOVA FUNÇÃO NO FINAL DO ARQUIVO:
@@ -154,7 +154,7 @@ def analisar_preventiva(request):
         "total_paginas": total_paginas
     }
 
-    return render_template('tabela_resultado.html', dados=dados_formatados)
+    return render_template('resultado_preventiva.html', dados=dados_formatados)
 
 def excluir_arquivos():
     pasta_dados = current_app.config['UPLOAD_FOLDER']

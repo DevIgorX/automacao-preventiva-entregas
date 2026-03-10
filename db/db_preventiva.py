@@ -6,8 +6,8 @@ import os
 caminho_script = os.path.abspath(__file__)
 pasta_db = os.path.dirname(caminho_script)
 diretorio_raiz = os.path.dirname(pasta_db)
-pasta_app = os.path.join(diretorio_raiz,'app')
-diretorio_db = os.path.join(pasta_app,'dados_preventiva.db')
+
+diretorio_db = os.path.join(diretorio_raiz,'dados_preventiva.db')
 DB_PATH = diretorio_db
 
 def salvar_no_banco(df, nome_tabela="analise_resultado"):
