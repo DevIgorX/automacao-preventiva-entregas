@@ -152,3 +152,9 @@ body {
     letter-spacing: 0.3px;
 }
 
+
+/* Estilo da Sidebar */
+#sidebar_card { 
+    background: #2c3e50; 
+    color: #fff; 
+}

@@ -3,20 +3,15 @@
 {% block title %} Pagina de Analise {% endblock %}
 
 {% block content %}
-<!-- <div id="loader-overlay" class="style_loade" style="display: none;">
-    <div class="text-center">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-        <h4 class="mt-3 text-dark">Processando dados...</h4>
-    </div>
-</div> -->
 
-<div id="loading-overlay" style="display: none;">
-    <div class="spinner-container">
-        <div class="spinner"></div>
-        <p>Processando dados, por favor aguarde...</p>
+<div id="loader-overlay" class="style_loade">
+    <div class="text-center">
+        <i class="fas fa-spinner fa-spin fa-4x text-primary mb-3"></i>
+        <h4 class="text-dark">Processando dados...</h4>
     </div>
 </div>
 
+</div>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h2 text-dark"><i class="bi bi-cpu me-2"></i>Portal de Inteligência Logística</h1>
 </div>
@@ -25,7 +20,7 @@
     <div class="col-lg-9">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white py-3 border-bottom">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center" >
                     <i class="bi bi-truck text-primary fs-3 me-3"></i>
                     <div>
                         <h5 class="mb-0">Cruzamento Automático de Dados</h5>
@@ -41,7 +36,7 @@
                         {% if arquivos_presentes %}
                             {% for arq in arquivos_presentes %}
                             <span class="badge bg-white text-dark border shadow-sm p-2">
-                                <i class="bi bi-file-earmark-excel text-success me-1"></i> {{ arq }}
+                                <i class="fas fa-file-excel text-success me-1"></i> {{ arq }}
                             </span>
                             {% endfor %}
                         {% else %}
@@ -58,7 +53,7 @@
                         </a>
                     </div>
                     
-                    <div class="upload-area p-5 text-center border rounded mb-3" id="upload-area" style="cursor: pointer; background-color: #f8f9fa; border: 2px dashed #dee2e6;">
+                    <div class="upload-area p-5 text-center border rounded mb-3" id="upload-area" class="style_area" ">
                         <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
                         <h5 class="mt-2">Clique ou arraste os arquivos aqui</h5>
                         <input type="file" id="arquivos" name="arquivos" accept=".xlsx,.xls" multiple required style="display: none;">
@@ -82,5 +77,8 @@
         </div>
     </div>
 </div>
-<script src="{{ url_for('static', filename='js_preventiva/main.js') }}"></script>
 {% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js_preventiva/main.js') }}"></script>
+{% endblock%}

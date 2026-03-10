@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputArquivos = document.getElementById('arquivos');
     const fileList = document.getElementById('file-list');
     const formAnalise = document.getElementById('form-analise');
-    const loaderOverlay = document.getElementById('loader-overlay');
+    const loader = document.getElementById('loader-overlay');
 
     // 1. Abre o seletor de arquivos ao clicar na área de upload
     if (uploadArea && inputArquivos) {
@@ -26,25 +26,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Ativa o loader ao enviar formulários (como o de upload)
-    if (formAnalise && loaderOverlay) {
+
+    if (formAnalise) {
         formAnalise.addEventListener('submit', function() {
-            loaderOverlay.style.display = 'flex';
+            // Exibe o overlay de carregamento
+            if (loader) {
+                loader.style.display = 'flex';
+            }
+            
+            // Desabilita o botão para evitar cliques duplos
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-sync fa-spin me-2"></i>Processando...';
+            }
         });
     }
 
-    // 4. NOVA FUNCIONALIDADE: Captura o clique no link de "Processar"
-    // Procuramos por qualquer link que contenha "processar=true" na URL
-    const btnProcessar = document.querySelector('a[href*="processar=true"]');
-    
-    if (btnProcessar && loaderOverlay) {
-        btnProcessar.addEventListener('click', function(e) {
-            // Exibe o overlay de carregamento que você gosta
-            loaderOverlay.style.display = 'flex';
-            
-            // Opcional: Adiciona um efeito visual no próprio botão
-            this.classList.add('disabled');
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processando Dados...';
-        });
-    }
+
+
 });
