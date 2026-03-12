@@ -84,7 +84,7 @@ def login():
     return render_template('login.html', form=form)
 
 def pagina_analise_preventiva():
-    pasta_dados = current_app.config['UPLOAD_FOLDER']
+    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
 
     arquivos_no_servidor = []
 
@@ -103,7 +103,7 @@ def adicionar_arquivo(request):
         flash("Nenhum arquivo enviado!","danger")
         return redirect(url_for('rotas.pagina_analise'))
 
-    pasta_dados = current_app.config['UPLOAD_FOLDER']
+    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
 
     arquivos_pulados = []
     for arquivo in arquivos:
@@ -139,7 +139,7 @@ def analisar_preventiva(request):
         if resultado.returncode != 0:
             return render_template('erro.html', erro=resultado.stderr)
 
-    itens_por_pg = 7
+    itens_por_pg = 5
     try:
         lista_dados, total_itens = buscar_dados_paginados(pagina, itens_por_pg)
     except Exception as e:
@@ -157,7 +157,7 @@ def analisar_preventiva(request):
     return render_template('resultado_preventiva.html', dados=dados_formatados)
 
 def excluir_arquivos():
-    pasta_dados = current_app.config['UPLOAD_FOLDER']
+    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
 
     for arquivo in os.listdir(pasta_dados):
         caminho_arquivo = os.path.join(pasta_dados, arquivo)
@@ -167,7 +167,7 @@ def excluir_arquivos():
     return redirect(url_for('rotas.pagina_analise'))
        
 def baixar_preventiva():
-    pasta_dados = current_app.config['UPLOAD_FOLDER']
+    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
 
     data_hoje = datetime.today().strftime('%d-%m-%Y')
     nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'

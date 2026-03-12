@@ -1,174 +1,181 @@
-{% extends 'base_template.html' %}
+{% extends 'base_corporativo.html' %}
 
-<title> {% block title %}Resultado da Análise{% endblock %}</title>
+<title> {% block title %}Resultado Performance{% endblock %}</title>
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-primary">Resultado da Análise</h1>
+<div class="container mt-5">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
 
-            <div>
-                
-                    <a href="{{ url_for('rotas.download_relatorio_excel') }}" 
-                      class="btn btn-gradient-excel shadow-lg">
-                      <i class="bi bi-download"></i>
-                      <span>Exportar Excel</span>
-                    </a>
-                
-                    <a href="{{url_for('rotas.excluir_dados')}}" 
-                     class="btn btn-gradient-secondary shadow-lg">
-                      <i class="bi bi-arrow-counterclockwise"></i>
-                      <span>Nova Análise</span>
-                    </a>
-            </div>
+        <h2 class="mb-0">Performance Atual </h2>
+
+        <div class="d-flex gap-2">
+
+            <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-outline-primary shadow-sm">
+                <i class="fas fa-arrow-left me-1"></i> Nova Análise
+            </a>
+
+            <a href="{{ url_for('rotas.baixar_relatorio_preventiva') }}" class="btn btn-success shadow-sm">
+                <i class="fas fa-file-excel me-1"></i> Exportar Excel
+            </a>
+
         </div>
-
-        <div class="row">
-            <div class="col-md-3">
-                <div id="total-card" class="card text-center mb-3 card-clickable">
-                    <div class="card-header">Total de Pedidos</div>
-                    <div class="card-body">
-                        <h2 class="card-title">{{ data.total_pedidos }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div id="finalizados-card" class="card text-center text-white bg-success mb-3 card-clickable">
-                    <div class="card-header">Pedidos Finalizados</div>
-                    <div class="card-body">
-                        <h2 class="card-title">{{ data.pedidos_finalizados }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div id="pendentes-card" class="card text-center text-white bg-warning mb-3 card-clickable">
-                    <div class="card-header">Pendentes para Cobrar</div>
-                    <div class="card-body">
-                        <h2 class="card-title">{{ data.pedidos_pendentes }}</h2>
-                    </div>
-                </div>
-            </div>
-             <div class="col-md-3">
-                {% set meta = data.meta_performance %}
-                {% set atual = data.performance_atual %}
-                {% set cor_performance = 'bg-success' if atual >= meta else ('bg-warning' if atual >= meta * 0.95 else 'bg-danger') %}
-
-                <div class="card text-center text-white {{ cor_performance }} mb-3">
-                    <div class="card-header">Performance Atual</div>
-                    <div class="card-body">
-                        <h2 class="card-title">{{ atual }}%</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <h5>Meta de Performance: {{ meta }}%</h5>
-            <div class="progress" >
-                <div class="progress-bar {{ cor_performance }}" 
-                    role="progressbar" style="width: {{ atual }}%;" 
-                    aria-valuenow="{{ atual }}" aria-valuemin="0" aria-valuemax="100">
-                    {{ atual }}%
-                </div>
-            </div>
-        </div>
-
-        <h2 id="table-title" class="mt-5">Detalhes dos Pedidos Pendentes</h2>
-        
-        <div class="table-responsive" style="min-height: 400px;">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>
-                            <div class="filter-header">
-                                <span>Cidade</span>
-                                <div class="dropdown">
-                                    <i class="bi bi-funnel-fill filter-icon" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                    <div class="dropdown-menu filter-dropdown-menu" id="filter-cidade" onclick="event.stopPropagation()">
-                                        </div>
-                                </div>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="filter-header">
-                                <span>Pedido</span>
-                                </div>
-                        </th>
-                        <th>
-                            <div class="filter-header">
-                                <span>Entregador</span>
-                                <div class="dropdown">
-                                    <i class="bi bi-funnel-fill filter-icon" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                    <div class="dropdown-menu filter-dropdown-menu" id="filter-entregador" onclick="event.stopPropagation()">
-                                        </div>
-                                </div>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="filter-header">
-                                <span>Status Atual</span>
-                                <div class="dropdown">
-                                    <i class="bi bi-funnel-fill filter-icon" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                                    <div class="dropdown-menu filter-dropdown-menu" id="filter-status" onclick="event.stopPropagation()">
-                                        </div>
-                                </div>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="pedidos-table-body">
-                    </tbody>
-            </table>
-        </div>
-         <p class="text-muted mt-3">O relatório completo <strong>{{ data.nome_relatorio }}</strong> foi gerado na pasta de dados do projeto.</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="row">
+        <div class="col-md-3">
+            <div id="total-card" class="card text-center mb-3 card-clickable">
+                <div class="card-header">Total de Pedidos</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ data.total_pedidos }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div id="finalizados-card" class="card text-center text-white bg-success mb-3 card-clickable">
+                <div class="card-header">Pedidos Finalizados</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ data.pedidos_finalizados }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div id="pendentes-card" class="card text-center text-white bg-warning mb-3 card-clickable">
+                <div class="card-header">Pendentes para Cobrar</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ data.pedidos_pendentes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            {% set meta = data.meta_performance %}
+            {% set atual = data.performance_atual %}
+            {% set cor_performance = 'bg-success' if atual >= meta else ('bg-warning' if atual >= meta * 0.95 else
+            'bg-danger') %}
 
-    <script>
-        const allData = {{ data | tojson }};
-        
-        // Variáveis globais de controle
-        let currentRawData = []; // Dados crus da aba selecionada (sem filtro)
-        let currentFilteredData = []; // Dados após filtro
-        
-        const tableBody = document.getElementById('pedidos-table-body');
-        const tableTitle = document.getElementById('table-title');
-        
-        // Referências aos cards
-        const totalCard = document.getElementById('total-card');
-        const finalizadosCard = document.getElementById('finalizados-card');
-        const pendentesCard = document.getElementById('pendentes-card');
-        const cards = [totalCard, finalizadosCard, pendentesCard];
+            <div class="card text-center text-white {{ cor_performance }} mb-3">
+                <div class="card-header">Performance Atual</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ atual }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // ============================================================
-        // FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO DA TABELA
-        // ============================================================
-        function renderTable(pedidos) {
-            tableBody.innerHTML = '';
-            
-            if (!pedidos || pedidos.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nenhum pedido encontrado com os filtros atuais.</td></tr>';
-                return;
+    <div class="mb-4">
+        <h5>Meta de Performance: {{ meta }}%</h5>
+        <div class="progress">
+            <div class="progress-bar {{ cor_performance }}" role="progressbar" style="width: {{ atual }}%;"
+                aria-valuenow="{{ atual }}" aria-valuemin="0" aria-valuemax="100">
+                {{ atual }}%
+            </div>
+        </div>
+    </div>
+
+    <h2 id="table-title" class="mt-5">Detalhes dos Pedidos Pendentes</h2>
+
+    <div class="table-responsive" style="min-height: 400px;">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>
+                        <div class="filter-header">
+                            <span>Cidade</span>
+                            <div class="dropdown">
+                                <i class="bi bi-funnel-fill filter-icon" data-bs-toggle="dropdown"
+                                    aria-expanded="false"></i>
+                                <div class="dropdown-menu filter-dropdown-menu" id="filter-cidade"
+                                    onclick="event.stopPropagation()">
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="filter-header">
+                            <span>Pedido</span>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="filter-header">
+                            <span>Entregador</span>
+                            <div class="dropdown">
+                                <i class="bi bi-funnel-fill filter-icon" data-bs-toggle="dropdown"
+                                    aria-expanded="false"></i>
+                                <div class="dropdown-menu filter-dropdown-menu" id="filter-entregador"
+                                    onclick="event.stopPropagation()">
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="filter-header">
+                            <span>Status Atual</span>
+                            <div class="dropdown">
+                                <i class="bi bi-funnel-fill filter-icon" data-bs-toggle="dropdown"
+                                    aria-expanded="false"></i>
+                                <div class="dropdown-menu filter-dropdown-menu" id="filter-status"
+                                    onclick="event.stopPropagation()">
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="pedidos-table-body">
+            </tbody>
+        </table>
+    </div>
+    <p class="text-muted mt-3">O relatório completo <strong>{{ data.nome_relatorio }}</strong> foi gerado na pasta de
+        dados do projeto.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+<script>
+    const allData = {{ data | tojson }};
+
+    // Variáveis globais de controle
+    let currentRawData = []; // Dados crus da aba selecionada (sem filtro)
+    let currentFilteredData = []; // Dados após filtro
+
+    const tableBody = document.getElementById('pedidos-table-body');
+    const tableTitle = document.getElementById('table-title');
+
+    // Referências aos cards
+    const totalCard = document.getElementById('total-card');
+    const finalizadosCard = document.getElementById('finalizados-card');
+    const pendentesCard = document.getElementById('pendentes-card');
+    const cards = [totalCard, finalizadosCard, pendentesCard];
+
+    // ============================================================
+    // FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO DA TABELA
+    // ============================================================
+    function renderTable(pedidos) {
+        tableBody.innerHTML = '';
+
+        if (!pedidos || pedidos.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nenhum pedido encontrado com os filtros atuais.</td></tr>';
+            return;
+        }
+
+        // Limite de renderização para não travar o navegador se houver milhares de linhas
+        const limite = 500;
+        const dadosParaExibir = pedidos.slice(0, limite);
+
+        dadosParaExibir.forEach(pedido => {
+            let status = pedido.Tipo || 'N/A';
+            let badgeClass = 'bg-secondary';
+
+            if (status.includes('Entrega Realizada')) {
+                badgeClass = 'bg-success';
+            } else if (status.includes('Pendente') || status.includes('Saiu para Entrega') || status.includes('Tentativa')) {
+                badgeClass = 'bg-warning text-dark';
+            } else if (status.includes('devolvida')) {
+                badgeClass = 'bg-danger';
             }
 
-            // Limite de renderização para não travar o navegador se houver milhares de linhas
-            const limite = 500; 
-            const dadosParaExibir = pedidos.slice(0, limite);
-
-            dadosParaExibir.forEach(pedido => {
-                let status = pedido.Tipo || 'N/A';
-                let badgeClass = 'bg-secondary';
-
-                if (status.includes('Entrega Realizada')) {
-                    badgeClass = 'bg-success';
-                } else if (status.includes('Pendente') || status.includes('Saiu para Entrega') || status.includes('Tentativa')) {
-                    badgeClass = 'bg-warning text-dark';
-                } else if (status.includes('devolvida')) {
-                    badgeClass = 'bg-danger';
-                }
-
-                const row = `
+            const row = `
                     <tr>
                         <td>${pedido['cidade_cliente']}</td>
                         <td>${pedido['PEDIDO 1P/FULL']}</td>
@@ -176,148 +183,147 @@
                         <td><span class="badge ${badgeClass}">${status}</span></td>
                     </tr>
                 `;
-                tableBody.innerHTML += row;
-            });
+            tableBody.innerHTML += row;
+        });
 
-            if (pedidos.length > limite) {
-                tableBody.innerHTML += `<tr><td colspan="4" class="text-center text-muted">... e mais ${pedidos.length - limite} registros. Baixe o Excel para ver tudo.</td></tr>`;
-            }
+        if (pedidos.length > limite) {
+            tableBody.innerHTML += `<tr><td colspan="4" class="text-center text-muted">... e mais ${pedidos.length - limite} registros. Baixe o Excel para ver tudo.</td></tr>`;
         }
+    }
 
-        // ============================================================
-        // LÓGICA DOS FILTROS ESTILO EXCEL
-        // ============================================================
-        
-        // Gera os checkboxes dentro dos dropdowns baseados nos dados atuais
-        function generateFilters(data) {
-            // Mapeamento ID do filtro -> Chave no Objeto JSON
-            const filterMap = {
-                'filter-cidade': 'cidade_cliente',
-                'filter-entregador': 'Entregador',
-                'filter-status': 'Tipo'
-            };
+    // ============================================================
+    // LÓGICA DOS FILTROS ESTILO EXCEL
+    // ============================================================
 
-            for (const [elementId, dataKey] of Object.entries(filterMap)) {
-                const container = document.getElementById(elementId);
-                container.innerHTML = ''; // Limpa opções antigas
+    // Gera os checkboxes dentro dos dropdowns baseados nos dados atuais
+    function generateFilters(data) {
+        // Mapeamento ID do filtro -> Chave no Objeto JSON
+        const filterMap = {
+            'filter-cidade': 'cidade_cliente',
+            'filter-entregador': 'Entregador',
+            'filter-status': 'Tipo'
+        };
 
-                // Pega valores únicos e ordena
-                const uniqueValues = [...new Set(data.map(item => item[dataKey] || 'Vazio'))].sort();
+        for (const [elementId, dataKey] of Object.entries(filterMap)) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = ''; // Limpa opções antigas
 
-                // Adiciona opção "Selecionar Tudo"
-                const divAll = document.createElement('div');
-                divAll.className = 'form-check border-bottom pb-2 mb-2';
-                divAll.innerHTML = `
+            // Pega valores únicos e ordena
+            const uniqueValues = [...new Set(data.map(item => item[dataKey] || 'Vazio'))].sort();
+
+            // Adiciona opção "Selecionar Tudo"
+            const divAll = document.createElement('div');
+            divAll.className = 'form-check border-bottom pb-2 mb-2';
+            divAll.innerHTML = `
                     <input class="form-check-input select-all" type="checkbox" value="all" id="all-${elementId}" checked>
                     <label class="form-check-label fw-bold" for="all-${elementId}">
                         (Selecionar Tudo)
                     </label>
                 `;
-                container.appendChild(divAll);
+            container.appendChild(divAll);
 
-                // Adiciona os checkboxes individuais
-                uniqueValues.forEach((val, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'form-check filter-option';
-                    // Cria um ID único seguro para HTML
-                    const safeId = `${elementId}-${index}`;
-                    
-                    div.innerHTML = `
+            // Adiciona os checkboxes individuais
+            uniqueValues.forEach((val, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-check filter-option';
+                // Cria um ID único seguro para HTML
+                const safeId = `${elementId}-${index}`;
+
+                div.innerHTML = `
                         <input class="form-check-input filter-checkbox" type="checkbox" value="${val}" data-key="${dataKey}" id="${safeId}" checked>
                         <label class="form-check-label" for="${safeId}">
                             ${val}
                         </label>
                     `;
-                    container.appendChild(div);
-                });
+                container.appendChild(div);
+            });
 
-                // Evento para "Selecionar Tudo"
-                const selectAllCheckbox = divAll.querySelector('.select-all');
-                selectAllCheckbox.addEventListener('change', (e) => {
-                    const checkboxes = container.querySelectorAll('.filter-checkbox');
-                    checkboxes.forEach(cb => cb.checked = e.target.checked);
+            // Evento para "Selecionar Tudo"
+            const selectAllCheckbox = divAll.querySelector('.select-all');
+            selectAllCheckbox.addEventListener('change', (e) => {
+                const checkboxes = container.querySelectorAll('.filter-checkbox');
+                checkboxes.forEach(cb => cb.checked = e.target.checked);
+                applyFilters();
+            });
+
+            // Eventos para checkboxes individuais (para atualizar a tabela)
+            const individualCheckboxes = container.querySelectorAll('.filter-checkbox');
+            individualCheckboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    // Se desmarcar um, desmarca o "Selecionar Tudo"
+                    if (!cb.checked) selectAllCheckbox.checked = false;
                     applyFilters();
                 });
+            });
+        }
+    }
 
-                // Eventos para checkboxes individuais (para atualizar a tabela)
-                const individualCheckboxes = container.querySelectorAll('.filter-checkbox');
-                individualCheckboxes.forEach(cb => {
-                    cb.addEventListener('change', () => {
-                        // Se desmarcar um, desmarca o "Selecionar Tudo"
-                        if (!cb.checked) selectAllCheckbox.checked = false;
-                        applyFilters();
-                    });
-                });
+    // Aplica os filtros selecionados sobre o 'currentRawData'
+    function applyFilters() {
+        // Coleta o estado atual dos filtros
+        const activeFilters = {
+            'cidade_cliente': [],
+            'Entregador': [],
+            'Tipo': []
+        };
+
+        // Verifica quais checkboxes estão marcados
+        document.querySelectorAll('.filter-checkbox:checked').forEach(cb => {
+            const key = cb.dataset.key;
+            if (activeFilters[key]) {
+                activeFilters[key].push(cb.value);
             }
-        }
-
-        // Aplica os filtros selecionados sobre o 'currentRawData'
-        function applyFilters() {
-            // Coleta o estado atual dos filtros
-            const activeFilters = {
-                'cidade_cliente': [],
-                'Entregador': [],
-                'Tipo': []
-            };
-
-            // Verifica quais checkboxes estão marcados
-            document.querySelectorAll('.filter-checkbox:checked').forEach(cb => {
-                const key = cb.dataset.key;
-                if (activeFilters[key]) {
-                    activeFilters[key].push(cb.value);
-                }
-            });
-
-            // Filtra os dados
-            currentFilteredData = currentRawData.filter(item => {
-                const cidadeMatch = activeFilters['cidade_cliente'].includes(item['cidade_cliente'] || 'Vazio');
-                const entregadorMatch = activeFilters['Entregador'].includes(item['Entregador'] || 'Vazio');
-                const statusMatch = activeFilters['Tipo'].includes(item['Tipo'] || 'Vazio');
-                
-                return cidadeMatch && entregadorMatch && statusMatch;
-            });
-
-            renderTable(currentFilteredData);
-        }
-
-        // ============================================================
-        // CONTROLE DE ABAS (CARDS)
-        // ============================================================
-        
-        function switchDataSet(dataset, title, activeCard) {
-            // 1. Atualiza o visual dos cards
-            cards.forEach(card => card.classList.remove('active'));
-            if(activeCard) activeCard.classList.add('active');
-
-            // 2. Atualiza Título
-            tableTitle.innerText = title;
-
-            // 3. Define os dados globais atuais e reinicia filtros
-            currentRawData = dataset; 
-            generateFilters(currentRawData); // Recria os filtros com base nos novos dados
-            
-            // 4. Aplica filtros (que inicialmente estarão todos marcados) e renderiza
-            applyFilters(); 
-        }
-
-        // Event Listeners dos Cards
-        totalCard.addEventListener('click', () => {
-            switchDataSet(allData.lista_total, 'Lista Completa de Pedidos', totalCard);
         });
 
-        finalizadosCard.addEventListener('click', () => {
-            switchDataSet(allData.lista_finalizados, 'Detalhes dos Pedidos Finalizados', finalizadosCard);
+        // Filtra os dados
+        currentFilteredData = currentRawData.filter(item => {
+            const cidadeMatch = activeFilters['cidade_cliente'].includes(item['cidade_cliente'] || 'Vazio');
+            const entregadorMatch = activeFilters['Entregador'].includes(item['Entregador'] || 'Vazio');
+            const statusMatch = activeFilters['Tipo'].includes(item['Tipo'] || 'Vazio');
+
+            return cidadeMatch && entregadorMatch && statusMatch;
         });
 
-        pendentesCard.addEventListener('click', () => {
-            switchDataSet(allData.lista_pendentes, 'Detalhes dos Pedidos Pendentes', pendentesCard);
-        });
+        renderTable(currentFilteredData);
+    }
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            // Começa exibindo os pendentes
-            switchDataSet(allData.lista_pendentes, 'Detalhes dos Pedidos Pendentes', pendentesCard);
-        });
-    </script>
+    // ============================================================
+    // CONTROLE DE ABAS (CARDS)
+    // ============================================================
 
-{% endblock %}
+    function switchDataSet(dataset, title, activeCard) {
+        // 1. Atualiza o visual dos cards
+        cards.forEach(card => card.classList.remove('active'));
+        if (activeCard) activeCard.classList.add('active');
+
+        // 2. Atualiza Título
+        tableTitle.innerText = title;
+
+        // 3. Define os dados globais atuais e reinicia filtros
+        currentRawData = dataset;
+        generateFilters(currentRawData); // Recria os filtros com base nos novos dados
+
+        // 4. Aplica filtros (que inicialmente estarão todos marcados) e renderiza
+        applyFilters();
+    }
+
+    // Event Listeners dos Cards
+    totalCard.addEventListener('click', () => {
+        switchDataSet(allData.lista_total, 'Lista Completa de Pedidos', totalCard);
+    });
+
+    finalizadosCard.addEventListener('click', () => {
+        switchDataSet(allData.lista_finalizados, 'Detalhes dos Pedidos Finalizados', finalizadosCard);
+    });
+
+    pendentesCard.addEventListener('click', () => {
+        switchDataSet(allData.lista_pendentes, 'Detalhes dos Pedidos Pendentes', pendentesCard);
+    });
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        // Começa exibindo os pendentes
+        switchDataSet(allData.lista_pendentes, 'Detalhes dos Pedidos Pendentes', pendentesCard);
+    });
+</script> -->
+{% endblock%}

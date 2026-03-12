@@ -8,7 +8,7 @@ caminho_script = os.path.abspath(__file__)
 diretorio_analise = os.path.dirname(caminho_script)
 diretorio_raiz = os.path.dirname(diretorio_analise)
 sys.path.append(diretorio_raiz)
-caminho_dados = os.path.join(diretorio_raiz, 'dados')
+caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
 
 from app.utils import formatar_colunas
 from db.db_preventiva import salvar_no_banco
@@ -42,7 +42,7 @@ for arquivo in os.listdir(caminho_dados):
         df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
         
 
-df_preventiva = df_preventiva.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
+# df_preventiva = df_preventiva.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
 
 df_final = (
     df_preventiva

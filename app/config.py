@@ -13,6 +13,7 @@ diretorio_app = os.path.dirname(caminho_script)
 diretorio_raiz = os.path.dirname(diretorio_app)
 # Define o caminho para a pasta de dados
 caminho_dados = os.path.join(diretorio_raiz, 'dados')
+dados_preventiva = os.path.join(diretorio_raiz,'dados_preventiva')
 arquivo_gitkeep = os.path.abspath(os.path.join(caminho_dados,'.gitkeep'))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'chave-padrao-insegura') # Valor padrão apenas para evitar erros locais se esquecer o .env
@@ -21,6 +22,7 @@ DEBUG = os.getenv('FLASK_DEBUG', '0') == '1' # Converte string '1' para boolean 
 UPLOAD_FOLDER = caminho_dados
 ROOT_DIR = diretorio_raiz
 GITKEEP = arquivo_gitkeep
+UPLOAD_FOLDER_PREVENTIVA = dados_preventiva
 
 
 

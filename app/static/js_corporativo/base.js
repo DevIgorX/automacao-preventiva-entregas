@@ -1,7 +1,7 @@
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    // ... seus códigos anteriores de upload e loader ...
+    
 
     // Script da Sidebar movido para cá
     const btnSidebar = document.getElementById('sidebarCollapse');
