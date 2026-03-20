@@ -1,6 +1,6 @@
 from flask import  request, Blueprint, render_template
 
-from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva
+from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos
 
 rotas = Blueprint('rotas', __name__)
 
@@ -59,3 +59,7 @@ def limpar_arquivo():
 @rotas.route('/baixar_relatorio_preventiva')
 def baixar_relatorio_preventiva():
     return baixar_preventiva()
+
+@rotas.route('/conferencia_arquivos')
+def conferencia_qtd_arquivos():
+    return conferencia_arquivos()

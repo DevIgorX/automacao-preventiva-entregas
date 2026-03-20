@@ -1,4 +1,4 @@
-{% extends 'base_template.html' %}
+{% extends 'base_corporativo.html' %}
 
 {% block title %} Erro na Análise {% endblock %}
 
@@ -15,7 +15,7 @@
                     Não foi possível processar os arquivos. Verifique a mensagem de erro abaixo e tente novamente.
                 </p>
 
-                <div class="alert alert-danger text-start" role="alert">
+                <div class="alert-danger text-start" role="alert">
                     <h5 class="alert-heading">Detalhes do Erro:</h5>
                     <pre class="mb-0" style="white-space: pre-wrap;">{{ erro }}</pre>
                 </div>

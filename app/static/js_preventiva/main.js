@@ -6,6 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileList = document.getElementById('file-list');
     const formAnalise = document.getElementById('form-analise');
     const loader = document.getElementById('loader-overlay');
+    const alerts = document.querySelectorAll('.alert');
+
+
+     // Auto fechar alerts  (mensagens do flash)
+    if (alerts.length > 0) {
+        setTimeout(() => {
+            alerts.forEach(alert => {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000); 
+    }
 
     // 1. Abre o seletor de arquivos ao clicar na área de upload
     if (uploadArea && inputArquivos) {

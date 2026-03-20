@@ -50,7 +50,7 @@ def iniciar_app(request):
         return render_template('resultado.html', data=dados_analise)
 
     # Se for GET, apenas mostra a página de upload
-    return render_template('index.html')
+    return render_template('analise_performance.html')
 
 def deletar_dados():
     pasta_dados = current_app.config['UPLOAD_FOLDER']
@@ -93,6 +93,8 @@ def pagina_analise_preventiva():
             if arquivo != '.gitkeep':
                 arquivos_no_servidor.append(arquivo)
 
+    
+
     return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
 
 
@@ -116,11 +118,33 @@ def adicionar_arquivo(request):
         arquivo.save(caminho_completo)
     
     if arquivos_pulados:
-        flash(f"Atenção! O arquivo já estava no servidor e foi ignorado: {', '.join(arquivos_pulados)}", "warning") # flash(mensagem, categoria)"warning" → cor amarelo (atenção)
+        flash(f"Você já selecionou esse arquivo. Verifique e tente novamente.", "warning") # flash(mensagem, categoria)"warning" → cor amarelo (atenção)
     else:
         flash("Arquivo enviado com sucesso!", "success") #success cor verde
+
+    
+
+
+    
     
     return redirect(url_for('rotas.pagina_analise'))
+
+
+def conferencia_arquivos():
+    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
+    lista_arquivo = []
+
+    for arquivo in os.listdir(pasta_dados):
+        if arquivo != '.gitkeep':
+            lista_arquivo.append(arquivo)
+    
+    qtd_arquivos = len(lista_arquivo)
+
+    if qtd_arquivos != 6:
+     flash(f"Foram encontrados {qtd_arquivos} arquivo(s). Envie exatamente 6 arquivos para continuar.", "warning")
+     return redirect(url_for('rotas.pagina_analise'))
+
+    return redirect(url_for('rotas.analisar_dados'))
 
 
 def analisar_preventiva(request):
