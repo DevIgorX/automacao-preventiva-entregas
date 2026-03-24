@@ -79,3 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🔹 Inicialização padrão ao carregar a página
     renderTable(allData.lista_pendentes, 'Detalhes dos Pedidos Pendentes');
 });
+
+
+document.getElementById('analysis-form').addEventListener('submit', function() {
+    document.getElementById('submit-button').style.display = 'none';
+    document.getElementById('loading-button').style.display = 'block';
+});

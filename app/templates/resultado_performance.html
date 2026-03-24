@@ -52,7 +52,7 @@
             {% set cor_performance = 'bg-success' if atual >= meta else ('bg-warning' if atual >= meta * 0.95 else
             'bg-danger') %}
 
-            <div class="card text-center text-white {{ cor_performance }} mb-3">
+            <div class="card text-center text-white {{ cor_performance }} mb-3 card-clickable">
                 <div class="card-header">Performance Atual</div>
                 <div class="card-body">
                     <h2 class="card-title">{{ atual }}%</h2>
@@ -127,8 +127,6 @@
     <p class="text-muted mt-3">O relatório completo <strong>{{ data.nome_relatorio }}</strong> foi gerado na pasta de
         dados do projeto.</p>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/js/bootstrap.bundle.min.js"></script>
 
 
 

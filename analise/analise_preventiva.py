@@ -44,6 +44,7 @@ for arquivo in os.listdir(caminho_dados):
 
 # df_preventiva = df_preventiva.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
 
+
 df_final = (
     df_preventiva
         .merge(

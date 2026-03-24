@@ -47,7 +47,7 @@ def iniciar_app(request):
             return render_template('erro.html', erro=mensagem_erro_json)
 
         # Se tudo deu certo, mostra a página de resultado
-        return render_template('resultado.html', data=dados_analise)
+        return render_template('resultado_performance.html', data=dados_analise)
 
     # Se for GET, apenas mostra a página de upload
     return render_template('analise_performance.html')
@@ -144,7 +144,7 @@ def conferencia_arquivos():
      flash(f"Foram encontrados {qtd_arquivos} arquivo(s). Envie exatamente 6 arquivos para continuar.", "warning")
      return redirect(url_for('rotas.pagina_analise'))
 
-    return redirect(url_for('rotas.analisar_dados'))
+    return redirect(url_for('rotas.analisar_dados', processar='true'))
 
 
 def analisar_preventiva(request):
