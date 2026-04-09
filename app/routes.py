@@ -1,6 +1,6 @@
 from flask import  request, Blueprint, render_template
 
-from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos
+from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos , pagina_consulta
 
 rotas = Blueprint('rotas', __name__)
 
@@ -63,3 +63,8 @@ def baixar_relatorio_preventiva():
 @rotas.route('/conferencia_arquivos')
 def conferencia_qtd_arquivos():
     return conferencia_arquivos()
+
+
+@rotas.route('/consulta_pedido', methods=['GET', 'POST'])
+def rota_consulta():
+    return pagina_consulta(request)

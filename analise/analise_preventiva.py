@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime
 import os
 import sys
+import locale
 
 
 caminho_script = os.path.abspath(__file__)
@@ -11,7 +12,9 @@ sys.path.append(diretorio_raiz)
 caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
 
 from app.utils import formatar_colunas
-from db.db_preventiva import salvar_no_banco
+from db.db_preventiva import salvar_no_banco, buscar_ultimo_raw
+
+df_preventiva = df_carreta = df_esl = df_mobile = df_bipe = df_bipe_notas = None
 
 for arquivo in os.listdir(caminho_dados):
     caminho_arquivo = os.path.join(caminho_dados, arquivo)
@@ -20,29 +23,71 @@ for arquivo in os.listdir(caminho_dados):
         df_preventiva = pd.read_excel(caminho_arquivo)
         df_preventiva = formatar_colunas(df_preventiva)
         df_preventiva = df_preventiva.add_prefix('Preventiva_')
+        # df_preventiva['Preventiva_Pedido 1P/Full'] = df_preventiva['Preventiva_Pedido 1P/Full'].astype(str).str.strip()
+        salvar_no_banco(df_preventiva, "raw_preventiva")
+        
     elif 'Carreta' in arquivo:
         df_carreta = pd.read_excel(caminho_arquivo)
         df_carreta = formatar_colunas(df_carreta)
         df_carreta = df_carreta.add_prefix('Carreta_')
+        # df_carreta['Carreta_Pedido'] = df_carreta['Carreta_Pedido'].astype(str).str.strip()
+        salvar_no_banco(df_carreta, "raw_carreta")
+        
     elif 'magazine' in arquivo:
         df_esl = pd.read_excel(caminho_arquivo)
         df_esl = formatar_colunas(df_esl)
+        salvar_no_banco(df_esl, "raw_esl")
         df_esl = df_esl.add_prefix('Esl_')
     elif 'Mobile' in arquivo:
         df_mobile = pd.read_excel(caminho_arquivo)
         df_mobile = formatar_colunas(df_mobile)
         df_mobile = df_mobile.add_prefix('Mobile_')
+        # df_mobile['Mobile_Pedido'] = df_mobile['Mobile_Pedido'].astype(str).str.strip()
+        salvar_no_banco(df_mobile, "raw_mobile")
+        
     elif 'bipe_produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
         df_bipe = formatar_colunas(df_bipe)
         df_bipe = df_bipe.add_prefix('Bipe_Prod_')
+        # df_bipe['Bipe_Prod_Pedido'] = df_bipe['Bipe_Prod_Pedido'].astype(str).str.strip()
+        salvar_no_banco(df_bipe, "raw_bipe_produtos")
+        
     elif 'Bipe_de_notas' in arquivo:
         df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
         df_bipe_notas = formatar_colunas(df_bipe_notas)
+        salvar_no_banco(df_bipe_notas, "raw_bipe_notas")
         df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
         
 
-# df_preventiva = df_preventiva.drop_duplicates(subset='Preventiva_Pedido 1P/Full', keep='first')
+if df_preventiva is None:
+    dados_db = buscar_ultimo_raw("raw_preventiva")
+    if dados_db is not None: df_preventiva = dados_db.add_prefix('Preventiva_')
+    else: print("ERRO: Preventiva faltando!"); sys.exit(1)
+
+if df_carreta is None:
+    dados_db = buscar_ultimo_raw("raw_carreta")
+    if dados_db is not None: df_carreta = dados_db.add_prefix('Carreta_')
+    else: print("ERRO: Carreta faltando!"); sys.exit(1)
+
+if df_mobile is None:
+    dados_db = buscar_ultimo_raw("raw_mobile")
+    if dados_db is not None: df_mobile = dados_db.add_prefix('Mobile_')
+    else: print("ERRO: Mobile faltando!"); sys.exit(1)
+
+if df_esl is None:
+    dados_db = buscar_ultimo_raw("raw_esl")
+    if dados_db is not None: df_esl = dados_db.add_prefix('Esl_')
+    else: print("ERRO: Esl faltando!"); sys.exit(1)
+
+if df_bipe is None:
+    dados_db = buscar_ultimo_raw("raw_bipe_produtos")
+    if dados_db is not None: df_bipe = dados_db.add_prefix('Bipe_Prod_')
+    else: print("ERRO: Bipe de Produtos faltando!"); sys.exit(1)
+
+if df_bipe_notas is None:
+    dados_db = buscar_ultimo_raw("raw_bipe_notas")
+    if dados_db is not None: df_bipe_notas = dados_db.add_prefix('Bipe_Notas_')
+    else: print("ERRO: Bipe de notas faltando!"); sys.exit(1)
 
 
 df_final = (
@@ -150,7 +195,10 @@ for col in colunas_datas:
         df_final_3[col] = pd.to_datetime(df_final_3[col], errors='coerce').dt.strftime('%d/%m/%Y').fillna('Não informado')
 
 
-salvar_no_banco(df_final_3)
+# Adicione a data e hora em que a análise foi feita
+df_final_3['data_analise'] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+salvar_no_banco(df_final_3, "analise_resultado")
+
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
 nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'

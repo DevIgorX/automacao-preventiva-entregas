@@ -1,0 +1,55 @@
+{% extends 'base_corporativo.html' %}
+{% block title %}Consulta de Pedido{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="mb-4">Histórico do Pedido</h2>
+            <form method="POST" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="pedido" class="form-control form-control-lg" 
+                           placeholder="Introduza o número do pedido (ex: 1234567)" value="{{ pedido_procurado }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search me-2"></i>Pesquisar no Histórico
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if resultados %}
+        <div class="alert alert-info">
+            Foram encontradas <strong>{{ resultados|length }}</strong> ocorrências para este pedido.
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Data da Análise</th>
+                        <th>Status (Mobile)</th>
+                        <th>Entregador</th>
+                        <th>Ocorrência (ESL)</th>
+                        <th>Fluxo Carreta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in resultados %}
+                    <tr>
+                        <td><span class="badge bg-info text-dark">{{ r.data_analise }}</span></td>
+                        <td>{{ r.Mobile_Tipo }}</td>
+                        <td>{{ r.Mobile_Entregador }}</td>
+                        <td>{{ r['Esl_Última Ocorrência/Observações'] }}</td>
+                        <td>{{ r.Carreta_Tipo_Fluxo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% elif pedido_procurado %}
+        <div class="alert alert-warning">Nenhum registo encontrado para o pedido <strong>{{ pedido_procurado }}</strong>.</div>
+    {% endif %}
+</div>
+{% endblock %}

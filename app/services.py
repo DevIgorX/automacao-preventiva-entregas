@@ -5,7 +5,7 @@ import json
 import locale
 from datetime import datetime
 from .helpers import FormularioLogin
-from db.db_preventiva import buscar_dados_paginados
+from db.db_preventiva import buscar_dados_paginados , buscar_pedido_historico
 
 
 def iniciar_app(request):
@@ -122,28 +122,11 @@ def adicionar_arquivo(request):
     else:
         flash("Arquivo enviado com sucesso!", "success") #success cor verde
 
-    
-
-
-    
-    
     return redirect(url_for('rotas.pagina_analise'))
 
 
 def conferencia_arquivos():
-    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
-    lista_arquivo = []
-
-    for arquivo in os.listdir(pasta_dados):
-        if arquivo != '.gitkeep':
-            lista_arquivo.append(arquivo)
     
-    qtd_arquivos = len(lista_arquivo)
-
-    if qtd_arquivos != 6:
-     flash(f"Foram encontrados {qtd_arquivos} arquivo(s). Envie exatamente 6 arquivos para continuar.", "warning")
-     return redirect(url_for('rotas.pagina_analise'))
-
     return redirect(url_for('rotas.analisar_dados', processar='true'))
 
 
@@ -197,3 +180,13 @@ def baixar_preventiva():
     nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
 
     return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)
+
+def pagina_consulta(request):
+    resultados = []
+    pedido_id = ""
+    if request.method == 'POST':
+        pedido_id = request.form.get('pedido')
+        if pedido_id:
+            resultados = buscar_pedido_historico(pedido_id)
+            
+    return render_template('consulta.html', resultados=resultados, pedido_procurado=pedido_id)
