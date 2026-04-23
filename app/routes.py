@@ -1,13 +1,10 @@
 from flask import  request, Blueprint, render_template
 
-from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos , pagina_consulta
+from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos , pagina_consulta , alimentar_base_dados , processar_consulta_lote
 
 rotas = Blueprint('rotas', __name__)
 
 
-# @rotas.route('/')
-# def menu_principal():
-#     return render_template('menu.html')
 
 @rotas.route('/')
 def pagina_inicial():
@@ -68,3 +65,33 @@ def conferencia_qtd_arquivos():
 @rotas.route('/consulta_pedido', methods=['GET', 'POST'])
 def rota_consulta():
     return pagina_consulta(request)
+
+
+
+# 1. ROTA DE ALIMENTAÇÃO DA BASE
+@rotas.route('/alimentar_base', methods=['GET', 'POST'])
+def rota_alimentar_base():
+    
+    if request.method == 'POST':
+        # Redireciona a requisição para a função de serviço que lida com o upload
+        return alimentar_base_dados(request)
+    
+    # Se for GET, apenas mostra a página com o formulário de upload
+    # (Você precisará criar ou adaptar um template HTML para esta página)
+    return render_template('alimentar_base.html')
+
+
+# 2. ROTA DE CONSULTA EM LOTE
+@rotas.route('/consulta_lote', methods=['GET', 'POST'])
+def rota_consulta_lote():
+    """
+    Página onde você sobe apenas o arquivo principal com a lista de pedidos (ex: Preventiva).
+    O sistema vai ler os pedidos, consultar o banco e retornar o Excel cruzado.
+    """
+    if request.method == 'POST':
+        # Redireciona a requisição para fazer a consulta SQL
+        return processar_consulta_lote(request)
+    
+    # Se for GET, mostra a página para enviar o arquivo de pedidos
+    # (Você precisará criar ou adaptar um template HTML para esta página)
+    return render_template('consulta_lote.html')

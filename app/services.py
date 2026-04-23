@@ -5,7 +5,10 @@ import json
 import locale
 from datetime import datetime
 from .helpers import FormularioLogin
-from db.db_preventiva import buscar_dados_paginados , buscar_pedido_historico
+from db.db_preventiva import buscar_dados_paginados , buscar_pedido_historico 
+
+from analise.alimentador import processar_e_salvar_tabela
+from analise.consultas import extrair_pedidos_e_consultar
 
 
 def iniciar_app(request):
@@ -190,3 +193,53 @@ def pagina_consulta(request):
             resultados = buscar_pedido_historico(pedido_id)
             
     return render_template('consulta.html', resultados=resultados, pedido_procurado=pedido_id)
+
+#1 Alimentar base de dados
+
+def alimentar_base_dados(request):
+    """Gerencia o upload de arquivos via formulário e chama o processador."""
+    
+    arquivos_enviados = request.files.getlist('arquivos')
+    
+    if not arquivos_enviados or arquivos_enviados[0].filename == '':
+        flash("Nenhum arquivo selecionado.", "danger")
+        return redirect(url_for('rotas.rota_alimentar_base'))
+
+    for arquivo in arquivos_enviados:
+        nome_arquivo = arquivo.filename
+        
+        # Chama a função externa que lida com o Pandas e Banco de Dados
+        tabela_atualizada = processar_e_salvar_tabela(arquivo, nome_arquivo)
+        
+        if tabela_atualizada:
+            flash(f"Base {tabela_atualizada} atualizada com sucesso!", "success")
+        else:
+            flash(f"Arquivo '{nome_arquivo}' ignorado (tipo não reconhecido).", "warning")
+
+    return redirect(url_for('rotas.rota_alimentar_base'))
+
+#2 alteração
+def processar_consulta_lote(request):
+    """Recebe o arquivo do formulário web e delega a consulta para o Pandas."""
+    
+    arquivo_pedidos = request.files.get('arquivo_pedidos')
+    
+    if not arquivo_pedidos or arquivo_pedidos.filename == '':
+        flash("Nenhum arquivo enviado para consulta.", "danger")
+        return redirect(url_for('rotas.rota_consulta_lote'))
+
+    # Delega o trabalho pesado: O Pandas e o Banco de Dados rodam aqui
+    dados_cruzados = extrair_pedidos_e_consultar(arquivo_pedidos)
+    
+    if not dados_cruzados: # Prevenção caso a planilha venha vazia
+        flash("Nenhum dado encontrado na consulta.", "warning")
+        return redirect(url_for('rotas.rota_consulta_lote'))
+    
+    dados_formatados = {
+        "Excel": dados_cruzados,
+        "pagina_atual": 1,
+        "total_paginas": 1
+    }
+
+    # Envia o resultado para o seu template (usando o formato que ele já espera)
+    return render_template('resultado_preventiva.html', dados=dados_formatados)

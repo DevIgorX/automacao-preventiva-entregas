@@ -12,7 +12,7 @@ sys.path.append(diretorio_raiz)
 caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
 
 from app.utils import formatar_colunas
-from db.db_preventiva import salvar_no_banco, buscar_ultimo_raw
+from db.db_preventiva import buscar_ultimo_raw, salvar_dados_base
 
 df_preventiva = df_carreta = df_esl = df_mobile = df_bipe = df_bipe_notas = None
 
@@ -23,39 +23,39 @@ for arquivo in os.listdir(caminho_dados):
         df_preventiva = pd.read_excel(caminho_arquivo)
         df_preventiva = formatar_colunas(df_preventiva)
         df_preventiva = df_preventiva.add_prefix('Preventiva_')
-        # df_preventiva['Preventiva_Pedido 1P/Full'] = df_preventiva['Preventiva_Pedido 1P/Full'].astype(str).str.strip()
-        salvar_no_banco(df_preventiva, "raw_preventiva")
+        df_preventiva['Preventiva_Pedido 1P/Full'] = df_preventiva['Preventiva_Pedido 1P/Full'].astype(str).str.strip()
+        salvar_dados_base(df_preventiva, "raw_preventiva")
         
     elif 'Carreta' in arquivo:
         df_carreta = pd.read_excel(caminho_arquivo)
         df_carreta = formatar_colunas(df_carreta)
         df_carreta = df_carreta.add_prefix('Carreta_')
-        # df_carreta['Carreta_Pedido'] = df_carreta['Carreta_Pedido'].astype(str).str.strip()
-        salvar_no_banco(df_carreta, "raw_carreta")
+        df_carreta['Carreta_Pedido'] = df_carreta['Carreta_Pedido'].astype(str).str.strip()
+        salvar_dados_base(df_carreta, "raw_carreta")
         
     elif 'magazine' in arquivo:
         df_esl = pd.read_excel(caminho_arquivo)
         df_esl = formatar_colunas(df_esl)
-        salvar_no_banco(df_esl, "raw_esl")
+        salvar_dados_base(df_esl, "raw_esl")
         df_esl = df_esl.add_prefix('Esl_')
     elif 'Mobile' in arquivo:
         df_mobile = pd.read_excel(caminho_arquivo)
         df_mobile = formatar_colunas(df_mobile)
         df_mobile = df_mobile.add_prefix('Mobile_')
-        # df_mobile['Mobile_Pedido'] = df_mobile['Mobile_Pedido'].astype(str).str.strip()
-        salvar_no_banco(df_mobile, "raw_mobile")
+        df_mobile['Mobile_Pedido'] = df_mobile['Mobile_Pedido'].astype(str).str.strip()
+        salvar_dados_base(df_mobile, "raw_mobile")
         
     elif 'bipe_produtos' in arquivo:
         df_bipe = pd.read_excel(caminho_arquivo)
         df_bipe = formatar_colunas(df_bipe)
         df_bipe = df_bipe.add_prefix('Bipe_Prod_')
-        # df_bipe['Bipe_Prod_Pedido'] = df_bipe['Bipe_Prod_Pedido'].astype(str).str.strip()
-        salvar_no_banco(df_bipe, "raw_bipe_produtos")
+        df_bipe['Bipe_Prod_Pedido'] = df_bipe['Bipe_Prod_Pedido'].astype(str).str.strip()
+        salvar_dados_base(df_bipe, "raw_bipe_produtos")
         
     elif 'Bipe_de_notas' in arquivo:
         df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
         df_bipe_notas = formatar_colunas(df_bipe_notas)
-        salvar_no_banco(df_bipe_notas, "raw_bipe_notas")
+        salvar_dados_base(df_bipe_notas, "raw_bipe_notas")
         df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
         
 
@@ -197,7 +197,7 @@ for col in colunas_datas:
 
 # Adicione a data e hora em que a análise foi feita
 df_final_3['data_analise'] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-salvar_no_banco(df_final_3, "analise_resultado")
+salvar_dados_base(df_final_3, "analise_resultado")
 
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')

@@ -1,0 +1,22 @@
+{% extends "base_corporativo.html" %} {% block content %}
+<div class="container mt-5">
+    <h2>Consulta em Lote de Pedidos</h2>
+    <p>Envie a planilha principal (ex: Preventiva). O sistema cruzará os pedidos com a base de dados atualizada.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('rotas.rota_consulta_lote') }}" method="POST" enctype="multipart/form-data" class="mt-4">
+        <div class="mb-3">
+            <label for="arquivo_pedidos" class="form-label">Planilha de Pedidos:</label>
+            <input class="form-control" type="file" id="arquivo_pedidos" name="arquivo_pedidos" accept=".xlsx, .xls, .csv" required>
+        </div>
+        <button type="submit" class="btn btn-success">Cruzar Dados</button>
+    </form>
+</div>
+{% endblock %}

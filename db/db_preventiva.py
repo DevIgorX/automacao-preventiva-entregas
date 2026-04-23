@@ -10,10 +10,10 @@ diretorio_raiz = os.path.dirname(pasta_db)
 diretorio_db = os.path.join(diretorio_raiz,'dados_preventiva.db')
 DB_PATH = diretorio_db
 
-def salvar_no_banco(df, nome_tabela="analise_resultado"):
-    """Salva o DataFrame no SQLite, sobrescrevendo a tabela anterior."""
+def salvar_dados_base(df, nome_tabela):
+    """Salva os dados de suporte (Carreta, Mobile, etc) substituindo os antigos."""
     conn = sqlite3.connect(DB_PATH)
-    # index=False evita criar uma coluna extra para o índice do Pandas
+    # 'replace' garante que a tabela seja recriada com os novos dados
     df.to_sql(nome_tabela, conn, if_exists='append', index=False)
     conn.close()
 
@@ -36,7 +36,20 @@ def buscar_dados_paginados(pagina, itens_por_pagina=10):
 def buscar_pedido_historico(pedido_id):
     conn = sqlite3.connect(DB_PATH)
     # Busca o histórico na tabela de resultados já processados
-    query = "SELECT * FROM analise_resultado WHERE `Preventiva_Pedido 1P/Full` = ?"
+    query =  """
+        SELECT 
+            c.*, 
+            m.Mobile_Tipo, m.Mobile_Entregador,
+            e."Esl_Última Ocorrência/Observações", e."Esl_Pessoa/Nome",
+            bp.Bipe_Prod_Status_Deposito,
+            bn.Bipe_Notas_Ocorrencia
+        FROM raw_carreta c
+        LEFT JOIN raw_mobile m ON c.Carreta_Pedido = m.Mobile_Pedido
+        LEFT JOIN raw_esl e ON c.Carreta_Chave = e."Esl_Nota Fiscal/Chave Nf-E"
+        LEFT JOIN raw_bipe_produtos bp ON c.Carreta_Pedido = bp.Bipe_Prod_Pedido
+        LEFT JOIN raw_bipe_notas bn ON c."Carreta_Nf`S" = bn.Bipe_Notas_Nf
+        WHERE c.Carreta_Pedido = ?
+        """
     df = pd.read_sql(query, conn, params=(pedido_id,))
     conn.close()
     return df.to_dict(orient='records')
@@ -55,3 +68,40 @@ def buscar_ultimo_raw(nome_tabela):
     except Exception:
         conn.close()
         return None
+
+#mudança aqui
+def consulta_join_pedidos(lista_pedidos):
+    """Realiza o cruzamento de dados via SQL para uma lista de pedidos."""
+    if not lista_pedidos:
+        return pd.DataFrame()
+
+    conn = sqlite3.connect(DB_PATH)
+    
+    # Cria os placeholders (?, ?, ?) para evitar SQL Injection
+    placeholders = ', '.join(['?'] * len(lista_pedidos))
+    
+    # Query que faz o cruzamento (JOIN) das tabelas base
+    query = f"""
+    SELECT 
+        c.*, 
+        m.Mobile_Tipo, m.Mobile_Entregador,
+        e."Esl_Última Ocorrência/Observações", e."Esl_Pessoa/Nome",
+        bp.Bipe_Prod_Status_Deposito,
+        bn.Bipe_Notas_Ocorrencia
+    FROM raw_carreta c
+    LEFT JOIN raw_mobile m ON c.Carreta_Pedido = m.Mobile_Pedido
+    LEFT JOIN raw_esl e ON c.Carreta_Chave = e."Esl_Nota Fiscal/Chave Nf-E"
+    LEFT JOIN raw_bipe_produtos bp ON c.Carreta_Pedido = bp.Bipe_Prod_Pedido
+    LEFT JOIN raw_bipe_notas bn ON c."Carreta_Nf`S" = bn.Bipe_Notas_Nf
+    WHERE c.Carreta_Pedido IN ({placeholders})
+    """
+    
+    try:
+        df = pd.read_sql(query, conn, params=lista_pedidos)
+    except Exception as e:
+        print(f"Erro na consulta SQL: {e}")
+        df = pd.DataFrame()
+    finally:
+        conn.close()
+        
+    return df

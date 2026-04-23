@@ -1,0 +1,22 @@
+{% extends "base_corporativo.html" %} {% block content %}
+<div class="container mt-5">
+    <h2>Atualizar Banco de Dados (Suporte)</h2>
+    <p>Envie as planilhas da Carreta, Mobile, ESL, Bipe, etc., para manter o sistema atualizado.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('rotas.rota_alimentar_base') }}" method="POST" enctype="multipart/form-data" class="mt-4">
+        <div class="mb-3">
+            <label for="arquivos" class="form-label">Selecione as planilhas (pode selecionar várias):</label>
+            <input class="form-control" type="file" id="arquivos" name="arquivos" multiple accept=".xlsx, .xls, .csv">
+        </div>
+        <button type="submit" class="btn btn-primary">Atualizar Base</button>
+    </form>
+</div>
+{% endblock %}
