@@ -27,14 +27,22 @@ def salvar_dados_base(df, nome_tabela, coluna_chave=None):
     conn = sqlite3.connect(DB_PATH)
     
     try:
+        if nome_tabela == 'analise_resultado':
+            df.to_sql(nome_tabela, conn, if_exists='replace', index=False )
+            return
+
+
         # 1. Tenta baixar o histórico que já existe no banco
         df_historico = pd.read_sql(f"SELECT * FROM {nome_tabela}", conn)
         
         # 2. Junta o histórico antigo com os dados da planilha nova
         df_combinado = pd.concat([df_historico, df], ignore_index=True)
+
+
+        
         
         # 3. Remove as duplicatas mantendo a informação mais fresca
-        if coluna_chave and coluna_chave in df_combinado.columns:
+        if coluna_chave and coluna_chave in df_combinado.columns: #1 coluna_chave verifica se a coluna chave foi passada e se existe dentro de df_combinado.columns
             # Apaga o pedido velho e mantém o novo (keep='last')
             df_combinado = df_combinado.drop_duplicates(subset=[coluna_chave], keep='last')
         else:

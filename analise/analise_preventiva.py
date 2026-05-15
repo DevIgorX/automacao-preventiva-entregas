@@ -3,14 +3,16 @@ from datetime import datetime
 import os
 import sys
 import locale
-from app.utils import formatar_colunas
-from db.db_preventiva import buscar_ultimo_raw, salvar_dados_base
+
 
 caminho_script = os.path.abspath(__file__)
 diretorio_analise = os.path.dirname(caminho_script)
 diretorio_raiz = os.path.dirname(diretorio_analise)
 sys.path.append(diretorio_raiz)
 caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
+
+from app.utils import formatar_colunas
+from db.db_preventiva import buscar_ultimo_raw, salvar_dados_base
 
 
 df_preventiva = df_carreta = df_esl = df_mobile = df_bipe = df_bipe_notas = None
@@ -204,8 +206,8 @@ for col in colunas_datas:
 
 # Adicione a data e hora em que a análise foi feita
 
-# df_final_3['data_analise'] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-# salvar_dados_base(df_final_3, "analise_resultado")
+df_final_3['data_analise'] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+salvar_dados_base(df_final_3, "analise_resultado", coluna_chave="Preventiva_Pedido 1P/Full")
 
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
