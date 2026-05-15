@@ -10,11 +10,44 @@ diretorio_raiz = os.path.dirname(pasta_db)
 diretorio_db = os.path.join(diretorio_raiz,'dados_preventiva.db')
 DB_PATH = diretorio_db
 
-def salvar_dados_base(df, nome_tabela):
-    """Salva os dados de suporte (Carreta, Mobile, etc) substituindo os antigos."""
+# def salvar_dados_base(df, nome_tabela):
+#     """Salva os dados de suporte (Carreta, Mobile, etc) substituindo os antigos."""
+#     conn = sqlite3.connect(DB_PATH)
+#     # 'replace' garante que a tabela seja recriada com os novos dados
+#     df.to_sql(nome_tabela, conn, if_exists='append', index=False)
+#     conn.close()
+
+
+def salvar_dados_base(df, nome_tabela, coluna_chave=None):
+    """
+    Salva os dados preservando o histórico da logística.
+    Se o pedido já existir, atualiza com a versão mais recente.
+    Se não existir, adiciona como histórico novo.
+    """
     conn = sqlite3.connect(DB_PATH)
-    # 'replace' garante que a tabela seja recriada com os novos dados
-    df.to_sql(nome_tabela, conn, if_exists='append', index=False)
+    
+    try:
+        # 1. Tenta baixar o histórico que já existe no banco
+        df_historico = pd.read_sql(f"SELECT * FROM {nome_tabela}", conn)
+        
+        # 2. Junta o histórico antigo com os dados da planilha nova
+        df_combinado = pd.concat([df_historico, df], ignore_index=True)
+        
+        # 3. Remove as duplicatas mantendo a informação mais fresca
+        if coluna_chave and coluna_chave in df_combinado.columns:
+            # Apaga o pedido velho e mantém o novo (keep='last')
+            df_combinado = df_combinado.drop_duplicates(subset=[coluna_chave], keep='last')
+        else:
+            # Fallback: se não tiver coluna chave, remove apenas se a linha for 100% igual
+            df_combinado = df_combinado.drop_duplicates(keep='last')
+            
+        # 4. Salva a tabela limpa, atualizada e sem dados duplicados
+        df_combinado.to_sql(nome_tabela, conn, if_exists='replace', index=False)
+        
+    except Exception:
+        # Se a tabela não existir ainda no banco (ex: primeira vez rodando), apenas cria
+        df.to_sql(nome_tabela, conn, if_exists='replace', index=False)
+        
     conn.close()
 
 def buscar_dados_paginados(pagina, itens_por_pagina=10):
