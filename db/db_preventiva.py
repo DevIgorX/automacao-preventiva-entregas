@@ -39,8 +39,6 @@ def salvar_dados_base(df, nome_tabela, coluna_chave=None):
         df_combinado = pd.concat([df_historico, df], ignore_index=True)
 
 
-        
-        
         # 3. Remove as duplicatas mantendo a informação mais fresca
         if coluna_chave and coluna_chave in df_combinado.columns: #1 coluna_chave verifica se a coluna chave foi passada e se existe dentro de df_combinado.columns
             # Apaga o pedido velho e mantém o novo (keep='last')

@@ -4,6 +4,10 @@ def formatar_colunas(df):
 
 
 
+def formatar_coluna_pedidos(df,coluna_pedido):
+    df[coluna_pedido] = df[coluna_pedido].fillna('').astype(str).str.replace('.0', '', regex=False).str.strip()
+    return df
+
 def formatar_colunas2(df):
     df.columns = (
         df.columns
