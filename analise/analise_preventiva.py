@@ -32,6 +32,7 @@ for arquivo in os.listdir(caminho_dados):
         df_carreta = formatar_colunas(df_carreta)
         df_carreta = df_carreta.add_prefix('Carreta_')
         df_carreta = formatar_coluna_pedidos(df_carreta,'Carreta_Pedido')
+        df_carreta = formatar_coluna_pedidos(df_carreta,'Carreta_Nf`S')
         salvar_dados_base(df_carreta,'raw_carreta', coluna_chave='Carreta_Pedido')
         
     elif 'magazine' in arquivo:
@@ -58,8 +59,10 @@ for arquivo in os.listdir(caminho_dados):
     elif 'Bipe_de_notas' in arquivo:
         df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
         df_bipe_notas = formatar_colunas(df_bipe_notas)
-        salvar_dados_base(df_bipe_notas, "raw_bipe_notas", coluna_chave="Bipe_Notas_Nf")
         df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
+        df_bipe_notas = formatar_coluna_pedidos(df_bipe_notas, 'Bipe_Notas_Nf')
+        salvar_dados_base(df_bipe_notas, "raw_bipe_notas", coluna_chave="Bipe_Notas_Nf")
+        
         
 
 if df_preventiva is None:

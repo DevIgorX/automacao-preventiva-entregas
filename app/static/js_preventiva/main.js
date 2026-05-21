@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000); 
     }
 
-    // 1. Abre o seletor de arquivos ao clicar na área de upload
+// 1. Abre o seletor de arquivos ao clicar na área de upload
     if (uploadArea && inputArquivos) {
-        uploadArea.addEventListener('click', function() {
+        uploadArea.addEventListener('click', function () {
             inputArquivos.click();
         });
     }
