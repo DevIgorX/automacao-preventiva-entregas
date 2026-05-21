@@ -31,7 +31,12 @@
                         <th>Status (Mobile)</th>
                         <th>Entregador (Mobile) </th>
                         <th>Ocorrência (ESL)</th>
+                        <th>Motorista (ESL)</th>
                         <th>Fluxo Carreta</th>
+                        <th>Data da Entrada</th>
+                        <th>Região</th>
+                        <th>Data de Vencimento</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -39,8 +44,16 @@
                     <tr>
                         <td>{{ r.Mobile_Tipo }}</td>
                         <td>{{ r.Mobile_Entregador }}</td>
-                        <td>{{ r['Esl_Última Ocorrência/Observações'] }}</td>
+                        <td>{{ r['Esl_Última Ocorrência/Observações'] or 'Sem Ocorrência registrada'}}</td>
+                        <td>{{ r['Esl_Pessoa/Nome'] }}</td>
                         <td>{{ r.Carreta_Tipo_Fluxo }}</td>
+                        <td>
+                            {{r['Carreta_Data Entrada'][8:10]}}/
+                            {{r['Carreta_Data Entrada'][5:7]}}/
+                            {{r['Carreta_Data Entrada'][:4]}}
+                        </td>
+                        <td>{{ r.Preventiva_Cidade_Cliente}}</td>
+                        <td>{{ r.data_analise[:10] }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
