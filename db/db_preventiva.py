@@ -49,12 +49,18 @@ def salvar_dados_base(df, nome_tabela, coluna_chave=None):
             
         # 4. Salva a tabela limpa, atualizada e sem dados duplicados
         df_combinado.to_sql(nome_tabela, conn, if_exists='replace', index=False)
+
+        conn.commit()
         
     except Exception:
         # Se a tabela não existir ainda no banco (ex: primeira vez rodando), apenas cria
         df.to_sql(nome_tabela, conn, if_exists='replace', index=False)
+
+        conn.commit()
+    finally:
+        conn.close()
         
-    conn.close()
+    
 
 def buscar_dados_paginados(pagina, itens_por_pagina=10):
     """Busca apenas as linhas necessárias para a página atual."""
@@ -70,32 +76,30 @@ def buscar_dados_paginados(pagina, itens_por_pagina=10):
     conn.close()
     
     return df.to_dict(orient='records'), total_registros
-
+       
 
 def buscar_pedido_historico(pedido_id):
     conn = sqlite3.connect(DB_PATH)
     # Busca o histórico na tabela de resultados já processados
-    query =  """
-        SELECT 
-            c.*, 
-            m.Mobile_Tipo, m.Mobile_Entregador,
-            e."Esl_Última Ocorrência/Observações", e."Esl_Pessoa/Nome",
-            bp.Bipe_Prod_Status_Deposito,
-            bn.Bipe_Notas_Ocorrencia,
-            p.Preventiva_Cidade_Cliente, 
-            rs.data_analise
+    query =  """ SELECT
+        c.*, 
+        m.*,
+        e."Esl_Ocorrência/Ocorrência", e."Esl_Pessoa/Nome", e."Esl_Última Ocorrência/Data Ocorrência", e."Esl_Nota Fiscal/Chave Nf-E",
+        bp.Bipe_Prod_Status_Deposito,
+        bn.Bipe_Notas_Ocorrencia,
+        p.*  
         FROM raw_carreta c
         LEFT JOIN raw_mobile m ON c.Carreta_Pedido = m.Mobile_Pedido
         LEFT JOIN raw_esl e ON c.Carreta_Chave = e."Esl_Nota Fiscal/Chave Nf-E"
         LEFT JOIN raw_bipe_produtos bp ON c.Carreta_Pedido = bp.Bipe_Prod_Pedido
         LEFT JOIN raw_bipe_notas bn ON c."Carreta_Nf`S" = bn.Bipe_Notas_Nf
         LEFT JOIN raw_preventiva p ON c.Carreta_Pedido = p."Preventiva_Pedido 1P/Full"
-        LEFT JOIN analise_resultado rs ON c.Carreta_Pedido = rs."Preventiva_Pedido 1P/Full"
         WHERE c.Carreta_Pedido = ?
         """
     df = pd.read_sql(query, conn, params=(pedido_id,))
     conn.close()
     return df.to_dict(orient='records')
+
 
 
 def buscar_ultimo_raw(nome_tabela):

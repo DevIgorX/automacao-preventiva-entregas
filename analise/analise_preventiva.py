@@ -77,7 +77,9 @@ if df_carreta is None:
 
 if df_mobile is None:
     dados_db = buscar_ultimo_raw("raw_mobile")
-    if dados_db is not None: df_mobile = dados_db.add_prefix('Mobile_')
+    if dados_db is not None: 
+        df_mobile = dados_db
+        df_mobile = formatar_coluna_pedidos(df_mobile, 'Mobile_Pedido')
     else: print("ERRO: Mobile faltando!"); sys.exit(1)
 
 if df_esl is None:

@@ -9,11 +9,11 @@
             <form method="POST" class="row g-3">
                 <div class="col-md-8">
                     <input type="text" name="pedido" class="form-control form-control-lg" 
-                           placeholder="Introduza o número do pedido (ex: 1234567)" value="{{ pedido_procurado }}">
+                           placeholder="Digite o número do pedido (ex: 123456789)" value="{{ pedido_procurado }}">
                 </div>
                 <div class="col-md-4">
                     <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i class="fas fa-search me-2"></i>Pesquisar no Histórico
+                        <i class="fas fa-search me-2"></i>Consultar Pedido
                     </button>
                 </div>
             </form>
@@ -30,13 +30,17 @@
                     <tr>
                         <th>Status (Mobile)</th>
                         <th>Entregador (Mobile) </th>
+                        <th>Data(Mobile)</th>
                         <th>Ocorrência (ESL)</th>
                         <th>Motorista (ESL)</th>
+                        <th>Data(ESL)</th>
                         <th>Fluxo Carreta</th>
                         <th>Data da Entrada</th>
                         <th>Região</th>
                         <th>Data de Vencimento</th>
-
+                        <th>Bipe Deposito</th>
+                        <th>Bipe de Notas</th>
+                        <th>Chave Nf-e</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,16 +48,25 @@
                     <tr>
                         <td>{{ r.Mobile_Tipo }}</td>
                         <td>{{ r.Mobile_Entregador }}</td>
-                        <td>{{ r['Esl_Última Ocorrência/Observações'] or 'Sem Ocorrência registrada'}}</td>
-                        <td>{{ r['Esl_Pessoa/Nome'] }}</td>
+                        <td>{{ r['Mobile_Data De Processamento']}}</td>
+                        <td>{{ r['Esl_Ocorrência/Ocorrência'] or ''}}</td>
+                        <td>{{ r['Esl_Pessoa/Nome'] or '' }}</td>
+                        <td>
+                            {{r['Esl_Última Ocorrência/Data Ocorrência'][8:10]}}/
+                            {{r['Esl_Última Ocorrência/Data Ocorrência'][5:7]}}/
+                            {{r['Esl_Última Ocorrência/Data Ocorrência'][:4]}}
+                        </td>
                         <td>{{ r.Carreta_Tipo_Fluxo }}</td>
                         <td>
                             {{r['Carreta_Data Entrada'][8:10]}}/
                             {{r['Carreta_Data Entrada'][5:7]}}/
                             {{r['Carreta_Data Entrada'][:4]}}
                         </td>
-                        <td>{{ r.Preventiva_Cidade_Cliente}}</td>
-                        <td>{{ r.data_analise[:10] }}</td>
+                        <td>{{ r.Preventiva_Cidade_Cliente or ''}}</td>
+                        <td>{{r.Bipe_Prod_Status_Deposito}}</td>
+                        <td>{{r.Bipe_Notas_Ocorrencia}}</td>
+                        <td>{{r['Esl_Nota Fiscal/Chave Nf-E']}}</td>
+                    
                     </tr>
                     {% endfor %}
                 </tbody>

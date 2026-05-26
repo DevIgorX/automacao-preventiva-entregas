@@ -189,8 +189,12 @@ def pagina_consulta(request):
     pedido_id = ""
     if request.method == 'POST':
         pedido_id = request.form.get('pedido')
+        print(f'pedido recebido na rota: {pedido_id}')
         if pedido_id:
             resultados = buscar_pedido_historico(pedido_id)
+        
+        print('resultado da função:')
+        print(resultados)
             
     return render_template('consulta.html', resultados=resultados, pedido_procurado=pedido_id)
 
