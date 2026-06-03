@@ -2,6 +2,9 @@ import sqlite3
 import pandas as pd
 import os
 
+# Ensina o SQLite a converter Timestamps(02/06/2026) do Pandas para Texto automaticamente
+sqlite3.register_adapter(pd.Timestamp, str)
+
 # Caminho para o banco de dados na raiz do projeto
 caminho_script = os.path.abspath(__file__)
 pasta_db = os.path.dirname(caminho_script)
@@ -50,13 +53,16 @@ def salvar_dados_base(df, nome_tabela, coluna_chave=None):
         # 4. Salva a tabela limpa, atualizada e sem dados duplicados
         df_combinado.to_sql(nome_tabela, conn, if_exists='replace', index=False)
 
-        conn.commit()
-        
-    except Exception:
-        # Se a tabela não existir ainda no banco (ex: primeira vez rodando), apenas cria
+        conn.commit()    
+    except pd.errors.DatabaseError:
+        # Se der esse erro específico, significa que a tabela realmente não existe ainda no banco
         df.to_sql(nome_tabela, conn, if_exists='replace', index=False)
-
         conn.commit()
+    except Exception as e:
+        # Se cair aqui, é porque as planilhas têm colunas diferentes ou dados incompativeis!
+        # Ele vai avisar o erro no terminal, mas NÃO VAI apagar sua base histórica
+        print(f"ERRO CRÍTICO AO ATUALIZAR A TABELA {nome_tabela}: {e}")
+        print("A tabela antiga foi mantida para evitar perda de dados.")
     finally:
         conn.close()
         
@@ -84,7 +90,7 @@ def buscar_pedido_historico(pedido_id):
     query =  """ SELECT
         c.*, 
         m.*,
-        e."Esl_Ocorrência/Ocorrência", e."Esl_Pessoa/Nome", e."Esl_Última Ocorrência/Data Ocorrência", e."Esl_Nota Fiscal/Chave Nf-E",
+        e."Esl_Ocorrência/Ocorrência", e."Esl_Pessoa/Nome", e."Esl_Última Ocorrência/Data Ocorrência", e."Esl_Nota Fiscal/Chave Nf-E", e."Esl_Última Ocorrência/Observações",
         bp.Bipe_Prod_Status_Deposito,
         bn.Bipe_Notas_Ocorrencia,
         p.*  
