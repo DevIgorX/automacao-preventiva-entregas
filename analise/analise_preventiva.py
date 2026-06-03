@@ -11,7 +11,7 @@ diretorio_raiz = os.path.dirname(diretorio_analise)
 sys.path.append(diretorio_raiz)
 caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
 
-from app.utils import formatar_colunas, formatar_coluna_pedidos
+from app.utils import formatar_colunas, formatar_coluna_pedidos , formatar_coluna_data
 from db.db_preventiva import buscar_ultimo_raw, salvar_dados_base
 
 
@@ -25,6 +25,7 @@ for arquivo in os.listdir(caminho_dados):
         df_preventiva = formatar_colunas(df_preventiva)
         df_preventiva = df_preventiva.add_prefix('Preventiva_')
         df_preventiva = formatar_coluna_pedidos(df_preventiva,'Preventiva_Pedido 1P/Full')
+        df_preventiva = formatar_coluna_data(df_preventiva, 'Preventiva_Data_Vencimento', pd)
         salvar_dados_base(df_preventiva, "raw_preventiva", coluna_chave="Preventiva_Pedido 1P/Full")
         
     elif 'Carreta' in arquivo:
@@ -97,6 +98,8 @@ if df_bipe_notas is None:
     if dados_db is not None: df_bipe_notas = dados_db.add_prefix('Bipe_Notas_')
     else: print("ERRO: Bipe de notas faltando!"); sys.exit(1)
 
+
+df_preventiva = df_preventiva[['Preventiva_Cidade_Cliente', 'Preventiva_Pedido 1P/Full']]
 
 df_final = (
     df_preventiva

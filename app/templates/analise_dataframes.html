@@ -23,15 +23,18 @@
                 <div class="d-flex align-items-center" >
                     <i class="bi bi-truck text-primary fs-3 me-3"></i>
                     <div>
-                        <h5 class="mb-0">Cruzamento Automático de Dados</h5>
-                        <small class="text-muted">Consolidação de Preventiva, Carreta, ESL, Mobile e Bipes</small>
+                        <h5 class="mb-0">Análise e Cruzamento Automático de Dados</h5>
+                        <small class="text-muted">Carregue os arquivos diários de <strong>Preventiva, Carreta, ESL, Mobile e Bipes</strong> para consolidar as Informações</small>
                     </div>
                 </div>
             </div>
 
             <div class="card-body p-4">
                 <div class="mb-4">
-                    <label class="form-label fw-bold text-uppercase small text-muted">Arquivos no Servidor:</label>
+                    <label class="form-label fw-bold text-dark small text-uppercase">
+                        <i class="fas fa-folder-open me-2 text-warning"></i>Arquivos já enviados:
+                    </label>
+
                     <div class="d-flex flex-wrap gap-2 p-3 bg-light rounded border border-dashed">
                         {% if arquivos_presentes %}
                             {% for arq in arquivos_presentes %}
@@ -47,7 +50,10 @@
 
                 <form method="POST" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data" class="mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label for="arquivos" class="form-label fw-bold mb-0">Novos Arquivos de Entrada (.xlsx)</label>
+                        <label for="arquivos" class="form-label fw-bold text-dark mb-0">
+                            <i class="far fa-file-excel me-2 text-success"></i>
+                            Arquivos de Entrada (.xlsx)
+                        </label>
                         <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-sm btn-outline-danger">
                             <i class="bi bi-trash me-1"></i> Limpar Tudo
                         </a>
@@ -78,7 +84,6 @@
     </div>
 </div>
 {% endblock %}
-
 
 
 

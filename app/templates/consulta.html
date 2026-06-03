@@ -132,9 +132,15 @@
                                     </div>
                                     <h6 class="text-dark fw-bold mb-0">⚙️ Informações Gerais</h6>
                                 </div>
-                                <div class="mb-2">
-                                    <small class="text-muted d-block">Região / Cidade</small>
-                                    <span class="fw-semibold text-dark">{{ r.Preventiva_Cidade_Cliente or '-' }}</span>
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Região / Cidade</small>
+                                        <span class="fw-semibold text-dark">{{ r.Preventiva_Cidade_Cliente or '-' }}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Prazo de Vencimento</small>
+                                        <span class="fw-semibold text-dark">{{ r.Preventiva_Data_Vencimento or '-' }}</span>
+                                    </div>
                                 </div>
                                 <div class="row g-2 mb-2">
                                     <div class="col-6">
