@@ -214,6 +214,7 @@ def alimentar_base_dados(request):
         
         # Chama a função externa que lida com o Pandas e Banco de Dados
         tabela_atualizada = processar_e_salvar_tabela(arquivo, nome_arquivo)
+        print(tabela_atualizada)
         
         if tabela_atualizada:
             flash(f"Base {tabela_atualizada} atualizada com sucesso!", "success")

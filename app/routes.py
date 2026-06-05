@@ -73,11 +73,9 @@ def rota_consulta():
 def rota_alimentar_base():
     
     if request.method == 'POST':
-        # Redireciona a requisição para a função de serviço que lida com o upload
         return alimentar_base_dados(request)
     
-    # Se for GET, apenas mostra a página com o formulário de upload
-    # (Você precisará criar ou adaptar um template HTML para esta página)
+    
     return render_template('alimentar_base.html')
 
 
