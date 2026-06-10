@@ -248,3 +248,19 @@ def processar_consulta_lote(request):
 
     # Envia o resultado para o seu template (usando o formato que ele já espera)
     return render_template('resultado_preventiva.html', dados=dados_formatados)
+
+
+
+def validar_acesso(request):
+
+    if request.method == 'POST':
+        senha_digitada = request.form.get('senha')
+
+        if senha_digitada == 'alohomora95':
+            flash('acesso liberado com sucesso!',"success")
+            return redirect(url_for('rotas.rota_alimentar_base'))
+        else:
+            flash('senha incorreta. Acesso negado.', 'danger')
+            redirect(url_for('rotas.rota_acesso_base'))
+    
+    return render_template('pedir_senha.html')

@@ -1,6 +1,6 @@
 from flask import  request, Blueprint, render_template
 
-from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos , pagina_consulta , alimentar_base_dados , processar_consulta_lote
+from .services import iniciar_app , deletar_dados, login, baixar_relatorio, pagina_analise_preventiva , adicionar_arquivo, analisar_preventiva , excluir_arquivos , baixar_preventiva, conferencia_arquivos , pagina_consulta , alimentar_base_dados , processar_consulta_lote, validar_acesso
 
 rotas = Blueprint('rotas', __name__)
 
@@ -66,9 +66,11 @@ def conferencia_qtd_arquivos():
 def rota_consulta():
     return pagina_consulta(request)
 
+@rotas.route('/acesso_base', methods=['GET', 'POST'])
+def rota_acesso_base():
+    return validar_acesso(request)
 
 
-# 1. ROTA DE ALIMENTAÇÃO DA BASE
 @rotas.route('/alimentar_base', methods=['GET', 'POST'])
 def rota_alimentar_base():
     
