@@ -32,12 +32,15 @@ def salvar_dados_base(df, nome_tabela, coluna_chave=None):
     try:
         if nome_tabela == 'analise_resultado':
             df.to_sql(nome_tabela, conn, if_exists='replace', index=False )
+            conn.commit()
             return
         elif nome_tabela == 'raw_bipe_produtos':
-            df.to_sql(nome_tabela, if_exists='replace', index=False )
+            df.to_sql(nome_tabela, conn, if_exists='replace', index=False )
+            conn.commit()
             return
         elif nome_tabela == 'raw_bipe_notas':
-            df.to_sql(nome_tabela, if_exists='replace', index=False )
+            df.to_sql(nome_tabela, conn, if_exists='replace', index=False )
+            conn.commit()
             return
 
 

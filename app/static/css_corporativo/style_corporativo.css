@@ -1,86 +1,84 @@
 /* app/static/css/style_corporativo.css */
-body { 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    overflow-x: hidden; 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
 }
 
-#wrapper { 
-    display: flex; 
-    width: 100%; 
-    align-items: stretch; 
+#wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
 }
 
 /* Estilo da Sidebar */
-#sidebar { 
-    min-width: 250px; 
-    max-width: 250px; 
-    background: #2c3e50; 
-    color: #fff; 
-    transition: all 0.3s ease; 
-    height: 100vh; 
-    position: sticky; 
-    top: 0; 
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #2c3e50;
+    color: #fff;
+    transition: all 0.3s ease;
+    height: 100vh;
+    position: sticky;
+    top: 0;
 }
 
-#sidebar.active { 
-    margin-left: -250px; 
-}
-
-
-#sidebar .sidebar-header { 
-    padding: 25px 20px; 
-    background-color: #1a252f; 
-    
-    background-image: repeating-linear-gradient(
-        45deg,
-        rgba(255, 255, 255, 0.07),
-        rgba(255, 255, 255, 0.07) 15px,
-        transparent 15px,
-        transparent 30px
-    );
-    border-bottom: 1px solid rgba(255, 255, 255, 0.01); 
+#sidebar.active {
+    margin-left: -250px;
 }
 
 
+#sidebar .sidebar-header {
+    padding: 25px 20px;
+    background-color: #1a252f;
 
-#sidebar .sidebar-header h3 { 
-    font-size: 1.2rem; 
-    margin: 0; 
+    background-image: repeating-linear-gradient(45deg,
+            rgba(255, 255, 255, 0.07),
+            rgba(255, 255, 255, 0.07) 15px,
+            transparent 15px,
+            transparent 30px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.01);
 }
 
-#sidebar ul.components { 
-    padding: 20px 0; 
-    border-bottom: 1px solid #47748b; 
+
+
+#sidebar .sidebar-header h3 {
+    font-size: 1.2rem;
+    margin: 0;
 }
 
-#sidebar ul li a { 
-    padding: 10px 20px; 
-    font-size: 1.1em; 
-    display: block; 
-    color: rgba(255,255,255,0.8); 
-    text-decoration: none; 
-    transition: 0.3s; 
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid #47748b;
 }
 
-#sidebar ul li a:hover { 
-    color: #fff; 
-    background: rgba(255,255,255,0.1); 
+#sidebar ul li a {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: 0.3s;
 }
 
-#sidebar ul li.active > a { 
-    color: #fff; 
-    background: #34495e; 
+#sidebar ul li a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#sidebar ul li.active>a {
+    color: #fff;
+    background: #34495e;
 }
 
 /* Estilo do Header e Conteúdo */
-#content { 
-    width: 100%; 
+#content {
+    width: 100%;
     transition: all 0.3s ease;
 }
 
-.navbar-custom { 
-    background-color: #f8f9fa; 
-    border-bottom: 1px solid #dee2e6; 
+.navbar-custom {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
 }
 
 /* Cards do Dashboard */
@@ -128,17 +126,17 @@ body {
 
 /* Estilo do Loader Overlay */
 #loader-overlay {
-    display: none; 
-    position: fixed; 
+    display: none;
+    position: fixed;
     top: 0;
-     left: 0; 
-     width: 100%;
-      height: 100%; 
-      background: rgba(255,255,255,0.8); 
-      z-index: 9999; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Efeito Hover na Área de Upload */
@@ -167,7 +165,7 @@ body {
 
 
 /* Estilo da Sidebar */
-#sidebar_card { 
-    background: #2c3e50; 
-    color: #fff; 
+#sidebar_card {
+    background: #2c3e50;
+    color: #fff;
 }
