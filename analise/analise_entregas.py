@@ -86,22 +86,25 @@ if df_relatorio is None:
 # ==============================================================================
 print("Validando e padronizando dados...", file=sys.stderr)
 
-# --- 1. Tratamento do Relatório Mobile (Mantido) ---
-df_relatorio['Pedido'] = df_relatorio['Pedido'].astype(str).replace('nan', '')
-df_relatorio['Pedido Cliente'] = df_relatorio['Pedido Cliente'].astype(str).replace('nan', '')
+# --- 1. Tratamento do Relatório Mobile (Corrigido) ---
+# Preenchemos os vazios com string vazia antes de converter para evitar 'nan'
+df_relatorio['Pedido'] = df_relatorio['Pedido'].fillna('').astype(str)
+df_relatorio['Pedido Cliente'] = df_relatorio['Pedido Cliente'].fillna('').astype(str)
 
 def corrigir_pedido_relatorio(row):
-    pedido_atual = row['Pedido']
-    pedido_cliente = row['Pedido Cliente']
-    # pedido_atual.strip() == '' or pedido_atual.lower() == 'nan'
-
-    if not pedido_atual:
+    # Envolvemos em str() para garantir 100% que nunca será um float
+    pedido_atual = str(row['Pedido']).strip()
+    pedido_cliente = str(row['Pedido Cliente']).strip()
+    
+    # Verificação segura de campos vazios ou nulos
+    if not pedido_atual or pedido_atual == '' or pedido_atual.lower() == 'nan':
         if pedido_cliente.endswith('.0'):
             pedido_cliente = pedido_cliente[:-2]
         return f"{pedido_cliente}-1"
     
     if pedido_atual.endswith('.0'):
         return pedido_atual[:-2]
+    
     return pedido_atual
 
 df_relatorio['Pedido'] = df_relatorio.apply(corrigir_pedido_relatorio, axis=1)
