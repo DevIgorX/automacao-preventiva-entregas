@@ -93,8 +93,9 @@ df_relatorio['Pedido Cliente'] = df_relatorio['Pedido Cliente'].astype(str).repl
 def corrigir_pedido_relatorio(row):
     pedido_atual = row['Pedido']
     pedido_cliente = row['Pedido Cliente']
-    
-    if not pedido_atual or pedido_atual.strip() == '' or pedido_atual.lower() == 'nan':
+    # pedido_atual.strip() == '' or pedido_atual.lower() == 'nan'
+
+    if not pedido_atual:
         if pedido_cliente.endswith('.0'):
             pedido_cliente = pedido_cliente[:-2]
         return f"{pedido_cliente}-1"
