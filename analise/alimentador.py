@@ -36,6 +36,31 @@ def processar_e_salvar_tabela(arquivo, nome_arquivo):
         
     elif 'magazine' in nome_arquivo or 'Esl' in nome_arquivo:
         df = df.add_prefix('Esl_')
+        
+        # --- 1. TRAVA DE SEGURANÇA DOS CABEÇALHOS ---
+        # Mapeamento para garantir que o banco recebe o nome exato esperado nas consultas
+        # independente de como o Excel enviar (maiúscula, minúscula, etc)
+        mapa_colunas = {}
+        for col in df.columns:
+            col_lower = col.lower()
+            if 'chave nf' in col_lower:
+                mapa_colunas[col] = 'Esl_Nota Fiscal/Chave Nf-E'
+            elif 'data ocorr' in col_lower and 'ação' not in col_lower:
+                mapa_colunas[col] = 'Esl_Última Ocorrência/Data Ocorrência'
+            elif 'observa' in col_lower and 'última' in col_lower:
+                mapa_colunas[col] = 'Esl_Última Ocorrência/Observações'
+            elif 'ocorrência/ocorrência' in col_lower or 'ocorrencia/ocorrencia' in col_lower:
+                mapa_colunas[col] = 'Esl_Ocorrência/Ocorrência'
+            elif 'pessoa/nome' in col_lower:
+                mapa_colunas[col] = 'Esl_Pessoa/Nome'
+                
+        df.rename(columns=mapa_colunas, inplace=True)
+        
+        # --- 2. LIMPEZA DA CHAVE DE ACESSO ---
+        # Usa a sua própria função do utils para tirar '.0' e espaços em branco da chave 44 dígitos
+        if 'Esl_Nota Fiscal/Chave Nf-E' in df.columns:
+            df = formatar_coluna_pedidos(df, 'Esl_Nota Fiscal/Chave Nf-E')
+            
         salvar_dados_base(df, "raw_esl", coluna_chave="Esl_Nota Fiscal/Chave Nf-E")
         return "Esl"
         
