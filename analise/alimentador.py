@@ -21,11 +21,23 @@ def processar_e_salvar_tabela(arquivo, nome_arquivo):
 
     df = formatar_colunas(df)
     
+    # if 'Carreta' in nome_arquivo:
+    #     df = df.add_prefix('Carreta_')
+    #     df = formatar_coluna_pedidos(df,'Carreta_Pedido')
+    #     df = formatar_coluna_pedidos(df,'Carreta_Nf`S')
+    #     salvar_dados_base(df,'raw_carreta', coluna_chave='Carreta_Pedido')
+    #     return 'Carreta'
     if 'Carreta' in nome_arquivo:
         df = df.add_prefix('Carreta_')
-        df = formatar_coluna_pedidos(df,'Carreta_Pedido')
-        df = formatar_coluna_pedidos(df,'Carreta_Nf`S')
-        salvar_dados_base(df,'raw_carreta', coluna_chave='Carreta_Pedido')
+        df = formatar_coluna_pedidos(df, 'Carreta_Pedido')
+        df = formatar_coluna_pedidos(df, 'Carreta_Nf`S')
+        
+        # --- ADICIONE ESTA LINHA: ---
+        # Garante que a chave da carreta não tem espaços e cruza perfeitamente com o ESL
+        if 'Carreta_Chave' in df.columns:
+            df = formatar_coluna_pedidos(df, 'Carreta_Chave')
+            
+        salvar_dados_base(df, 'raw_carreta', coluna_chave='Carreta_Pedido')
         return 'Carreta'
         
     elif 'Mobile' in nome_arquivo:
