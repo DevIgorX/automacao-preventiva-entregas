@@ -2,7 +2,8 @@ import pandas as pd
 import os
 import json
 import sys
-import re # Importando biblioteca de expressões regulares
+import re 
+import math
 
 # ==============================================================================
 # --- CONFIGURAÇÕES DE DIRETÓRIOS ---
@@ -169,6 +170,9 @@ pedidos_finalizados = len(df_finalizados)
 pedidos_pendentes = len(df_pendentes)
 performance = (pedidos_finalizados / total_pedidos) * 100 if total_pedidos > 0 else 0
 meta_performance = 96.00
+meta_diaria = 0.96
+qtd_calc = math.ceil((total_pedidos * meta_diaria)) - pedidos_finalizados
+qtd_para_bater_meta = max(0, qtd_calc)
 
 # Geração do Excel
 output_filename = os.path.join(caminho_dados, "Resultado_Monitoramento.xlsx")
@@ -207,7 +211,8 @@ resultados_json = {
     "arquivos_usados": f"{nome_preventiva_encontrado} + {nome_relatorio_encontrado}",
     "lista_pendentes": preparar_dados(df_pendentes),
     "lista_finalizados": preparar_dados(df_finalizados),
-    "lista_total": preparar_dados(df_resultado)
+    "lista_total": preparar_dados(df_resultado),
+    "pedidos_pendentes_para_meta": qtd_para_bater_meta
 }
 
 print(json.dumps(resultados_json))
