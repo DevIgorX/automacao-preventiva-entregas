@@ -1,4 +1,3 @@
-
 from contextlib import contextmanager
 from io import BytesIO
 import json
@@ -11,15 +10,44 @@ import tempfile
 import threading
 import time
 import zipfile
+from datetime import datetime
 
 import pandas as pd
 from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, session, url_for, abort
 from .engine import read_table, merge_tables
 
 bp = Blueprint('cruzamento', __name__, url_prefix='/cruzar-planilhas')
+
+@bp.app_template_filter('data_brasileira')
+def data_brasileira(valor):
+    if not isinstance(valor, str):
+        return valor
+
+    texto = valor.strip()
+
+    # Reconhece datas como 2026-10-21 ou 2026-10-21 00:00:00.
+    if not re.fullmatch(
+        r'\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?)?',
+        texto
+    ):
+        return valor
+
+    try:
+        data = datetime.fromisoformat(texto)
+    except ValueError:
+        return valor
+
+    # Mantém o horário quando houver uma hora informada.
+    if data.hour or data.minute or data.second or data.microsecond:
+        return data.strftime('%d/%m/%Y %H:%M:%S')
+
+    return data.strftime('%d/%m/%Y')
+
 # Waitress usa threads em um processo. Slots fixos evitam acumular locks por sessão.
 _locks = [threading.RLock() for _ in range(64)]
 TTL = 24*60*60
+
+
 
 
 def root():
@@ -212,6 +240,46 @@ def download():
         with pd.ExcelWriter(output, engine='xlsxwriter', engine_kwargs={'options': {'strings_to_formulas': False, 'strings_to_urls': False}}) as writer:
             df.to_excel(writer, sheet_name='Resultado', index=False)
             ws = writer.sheets['Resultado']
+
+            # Datas reais no Excel, exibidas no padrão brasileiro.
+            formato_data = writer.book.add_format({
+                'num_format': 'dd/mm/yyyy'
+            })
+            formato_data_hora = writer.book.add_format({
+                'num_format': 'dd/mm/yyyy hh:mm:ss'
+            })
+
+            for numero_coluna, coluna in enumerate(df.columns):
+                for numero_linha, valor in enumerate(df[coluna], start=1):
+                    if not isinstance(valor, str):
+                        continue
+
+                    texto = valor.strip()
+                    if not re.fullmatch(
+                        r'\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?)?',
+                        texto
+                    ):
+                        continue
+
+                    try:
+                        data = datetime.fromisoformat(texto)
+                    except ValueError:
+                        continue
+
+                    # Excel não representa corretamente datas anteriores a 1900.
+                    if data.year < 1900:
+                        continue
+
+                    tem_horario = (
+                        data.hour or data.minute
+                        or data.second or data.microsecond
+                    )
+                    formato = formato_data_hora if tem_horario else formato_data
+                    ws.write_datetime(
+                        numero_linha, numero_coluna, data, formato
+                    )
+
+
             ws.freeze_panes(1, 0)
             ws.autofilter(0, 0, len(df), len(df.columns)-1)
             ws.set_column(0, len(df.columns)-1, 24)
