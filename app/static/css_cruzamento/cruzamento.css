@@ -1,0 +1,12 @@
+/* Área de prévia das planilhas */
+.cruzamento-previa {
+    max-height: 300px;
+    overflow: auto;
+}
+
+/* Mantém o conteúdo das células em uma linha */
+.cruzamento-previa th,
+.cruzamento-previa td {
+    white-space: nowrap;
+}
+

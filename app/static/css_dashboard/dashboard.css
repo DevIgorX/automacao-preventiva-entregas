@@ -1,0 +1,102 @@
+.dashboard-modulos {
+    margin-bottom: 2rem;
+}
+
+/* Cores de cada ferramenta */
+.modulo-automatico {
+    --modulo-cor: #187447;
+    --modulo-fundo: #eaf6ef;
+}
+
+.modulo-personalizado {
+    --modulo-cor: #215bc1;
+    --modulo-fundo: #edf3ff;
+}
+
+.modulo-performance {
+    --modulo-cor: #34495e;
+    --modulo-fundo: #edf1f5;
+}
+
+.modulo-consulta {
+    --modulo-cor: #865600;
+    --modulo-fundo: #fff5dc;
+}
+
+/* Estrutura dos cartões */
+.modulo-card {
+    border: 1px solid #e2e8f0;
+    border-top: 4px solid var(--modulo-cor);
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 5%);
+}
+
+.modulo-card:hover {
+    transform: none;
+}
+
+.modulo-card .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.modulo-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.modulo-icone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background-color: var(--modulo-fundo);
+    color: var(--modulo-cor);
+    font-size: 1.5rem;
+}
+
+.modulo-etiqueta {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--modulo-cor);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.modulo-card .card-text {
+    color: #475569;
+    line-height: 1.6;
+}
+
+.modulo-orientacao {
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    border-radius: 8px;
+    background-color: var(--modulo-fundo);
+    color: #475569;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Mantém os botões alinhados na parte inferior */
+.modulo-botao {
+    margin-top: auto;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--modulo-cor);
+    background-color: var(--modulo-cor);
+    color: #fff;
+    font-weight: 600;
+}
+
+.modulo-botao:hover,
+.modulo-botao:focus-visible {
+    border-color: var(--modulo-cor);
+    background-color: var(--modulo-fundo);
+    color: var(--modulo-cor);
+}

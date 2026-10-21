@@ -1,0 +1,356 @@
+{% extends 'base_corporativo.html' %}
+
+{% block title %}
+Cruzar planilhas · Porta-a-Porta
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css_cruzamento/cruzamento.css') }}">
+{% endblock %}
+
+
+{# Campos de controle usados nos formulários POST #}
+{% macro hidden(action) %}
+<input type="hidden" name="csrf" value="{{ session.cruzamento_csrf }}">
+<input type="hidden" name="action" value="{{ action }}">
+{% endmacro %}
+
+
+{# Prévia reutilizável para a base e para as novas fontes #}
+{% macro preview(df) %}
+<div class="table-responsive cruzamento-previa">
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                {% for c in df.columns %}
+                <th scope="col">{{ c }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in df.head(8).values.tolist() %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted small">
+    Prévia de até 8 linhas ·
+    {{ df|length }} linhas ·
+    {{ df.columns|length }} colunas
+</p>
+{% endmacro %}
+
+
+{% block content %}
+
+<!-- Cabeçalho e encerramento da análise -->
+<div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <div>
+        <h1 class="h3">Cruzar planilhas</h1>
+        <p class="text-muted">
+            Escolha a base e acrescente informações de outras fontes,
+            uma etapa por vez.
+        </p>
+    </div>
+
+    {% if base is not none or state.pending %}
+    <form method="post"
+        onsubmit="return confirm('Encerrar e excluir os arquivos desta análise? Baixe o resultado antes de continuar.')">
+        {{ hidden('finish') }}
+
+        <button type="submit" class="btn btn-outline-danger">
+            Encerrar e excluir arquivos
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="alert alert-info">
+    Baixe a planilha com o resultado antes de encerrar ou começar uma nova análise.
+    Após 24 horas sem uso, será necessário enviar os arquivos novamente.
+    Faça uma análise por vez, pois abas abertas no mesmo navegador
+    compartilham a mesma análise.
+</div>
+
+
+<!-- Resultado acumulado -->
+{% if base is not none %}
+<section class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5">Resultado atual</h2>
+
+        <p>
+            Base: <strong>{{ state.base }}</strong> ·
+            {{ state.steps|length }} cruzamento(s)
+        </p>
+
+        {{ preview(base) }}
+
+        <!-- Exportação -->
+        <form method="get" action="{{ url_for('cruzamento.download') }}" class="mb-3">
+            <details class="mb-2">
+                <summary>
+                    Exportar colunas como números (opcional)
+                </summary>
+
+                <p class="small text-muted">
+                    Selecione pedidos ou notas apenas numéricos.
+                    Chaves de acesso de 44 dígitos permanecem como texto.
+                    Valores com zeros iniciais não serão convertidos.
+                </p>
+
+                {% for c in base.columns %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="numeric" value="{{ c }}"
+                        id="numeric{{ loop.index }}">
+                    <label class="form-check-label" for="numeric{{ loop.index }}">
+                        {{ c }}
+                    </label>
+                </div>
+                {% endfor %}
+            </details>
+
+            <button type="submit" class="btn btn-success">
+                Baixar Excel
+            </button>
+        </form>
+
+        <!-- Histórico dos cruzamentos -->
+        {% if state.steps %}
+        <details>
+            <summary>Etapas realizadas</summary>
+
+            <ol class="mt-2">
+                {% for step in state.steps %}
+                <li>
+                    <strong>{{ step.fonte }}</strong>:
+                    {{ step.chaves }}
+                    <br>
+                    {{ step.encontradas }} encontradas ·
+                    {{ step.sem_correspondencia }}
+                    sem correspondência ·
+                    {{ step.saida }} linhas no resultado
+                </li>
+                {% endfor %}
+            </ol>
+        </details>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+
+<!-- Envio de arquivo -->
+<section class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5">
+            {{ 'Adicionar outra fonte'
+            if base is not none
+            else '1. Enviar a planilha principal' }}
+        </h2>
+
+        <p>
+            O nome do arquivo não interfere no cruzamento.
+            Formatos: XLSX, XLS e CSV.
+            Até 25 MB por envio e 200 mil linhas no resultado.
+        </p>
+
+        <form method="post" enctype="multipart/form-data">
+            {{ hidden('upload') }}
+
+            <label for="file" class="form-label">
+                Arquivo da planilha
+            </label>
+            <input id="file" class="form-control mb-3" type="file" name="file" accept=".xlsx,.xls,.csv" required>
+
+            <button type="submit" class="btn btn-primary">
+                Enviar {{ 'nova fonte' if base is not none else 'planilha' }}
+            </button>
+        </form>
+    </div>
+</section>
+
+
+<!-- Configuração do arquivo enviado -->
+{% if state.pending %}
+<section class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5">
+            Conferir arquivo: {{ state.pending.name }}
+        </h2>
+
+        <form method="post" class="row g-3 align-items-end">
+            {{ hidden('preview') }}
+
+            <div class="col-md-5">
+                <label for="sheet" class="form-label">Aba</label>
+                <select class="form-select" id="sheet" name="sheet">
+                    {% for sheet in state.pending.sheets %}
+                    <option value="{{ sheet }}" {% if sheet==state.pending.sheet %}selected{% endif %}>
+                        {{ sheet }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="header" class="form-label">
+                    Linha dos títulos
+                </label>
+                <input class="form-control" id="header" name="header" type="number" min="1" max="100"
+                    value="{{ state.pending.header }}" required>
+            </div>
+
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary">
+                    Ler colunas e mostrar prévia
+                </button>
+            </div>
+        </form>
+
+
+        {% if source is not none %}
+        <hr>
+
+        {{ preview(source) }}
+
+        {% if base is none %}
+        <form method="post">
+            {{ hidden('base') }}
+
+            <button type="submit" class="btn btn-success">
+                Usar como planilha principal
+            </button>
+        </form>
+
+        {% else %}
+        <!-- Configuração do cruzamento -->
+        <form method="post">
+            {{ hidden('merge') }}
+
+            <h3 class="h5 mt-4">Configurar o cruzamento</h3>
+
+            <label for="label" class="form-label">
+                Nome desta fonte no resultado
+                (ex.: Carreta ou ESL)
+            </label>
+            <input class="form-control mb-3" name="label" id="label" maxlength="60" placeholder="Entrada de Carreta"
+                required>
+
+            <p>
+                Selecione as colunas correspondentes.
+                Para uma chave composta, preencha os pares
+                adicionais na mesma ordem.
+                Todas as partes precisam coincidir.
+            </p>
+
+            <!-- Pares de chaves -->
+            {% for i in range(3) %}
+            <div class="row g-2 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="left{{ i }}">
+                        {{ 'Coluna do resultado atual'
+                        if i == 0
+                        else 'Parte adicional da chave (opcional)' }}
+                    </label>
+
+                    <select class="form-select" id="left{{ i }}" name="left{{ i }}" {% if i==0 %}required{% endif %}>
+                        <option value="">Selecione...</option>
+
+                        {% for c in base.columns %}
+                        <option value="{{ c }}">
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="right{{ i }}">
+                        Coluna correspondente na nova fonte
+                    </label>
+
+                    <select class="form-select" id="right{{ i }}" name="right{{ i }}" {% if i==0 %}required{% endif %}>
+                        <option value="">Selecione...</option>
+
+                        {% for c in source.columns %}
+                        <option value="{{ c }}">
+                            {{ c }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Colunas que serão acrescentadas -->
+            <fieldset class="border rounded p-3 mb-3">
+                <legend class="float-none w-auto px-2 fs-6">
+                    Informações que deseja acrescentar
+                </legend>
+
+                <div class="row">
+                    {% for c in source.columns %}
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="columns" value="{{ c }}"
+                                id="column{{ loop.index }}">
+                            <label class="form-check-label" for="column{{ loop.index }}">
+                                {{ c }}
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <!-- Tratamento de múltiplas correspondências -->
+            <label class="form-label" for="policy">
+                Se a nova fonte tiver várias linhas
+                para a mesma chave
+            </label>
+
+            <select class="form-select mb-2" id="policy" name="policy">
+                <option value="error">
+                    Avisar e não realizar o cruzamento
+                </option>
+                <option value="first">
+                    Usar a primeira linha na ordem do arquivo
+                </option>
+                <option value="last">
+                    Usar a última linha na ordem do arquivo
+                </option>
+                <option value="join">
+                    Reunir valores diferentes na mesma célula
+                </option>
+                <option value="expand">
+                    Trazer todas as correspondências
+                    (aumenta as linhas)
+                </option>
+            </select>
+
+            <p class="small text-muted">
+                Primeira e última seguem a ordem do arquivo,
+                não a data da ocorrência.
+                Chaves vazias não se cruzam.
+                Repetições da planilha principal são preservadas.
+            </p>
+
+            <button type="submit" class="btn btn-primary">
+                Cruzar e acrescentar informações
+            </button>
+        </form>
+        {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

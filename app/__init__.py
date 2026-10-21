@@ -14,4 +14,7 @@ def create_app():
     # Registra os blueprints
     app.register_blueprint(rotas)
 
+    from .cruzamento import init_app as init_cruzamento
+    init_cruzamento(app)
+
     return app

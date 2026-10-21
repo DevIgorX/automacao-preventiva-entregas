@@ -1,55 +1,145 @@
 {% extends "base_corporativo.html" %}
 
+{% block title %}Página inicial · Porta-a-Porta{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css_dashboard/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2">Página Inicial</h1>
+<div class="mb-4">
+    <h1 class="h2">Página inicial</h1>
+    <p class="text-muted">
+        Escolha a ferramenta que deseja utilizar.
+    </p>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded p-3 me-3">
-                        <i class="bi bi-graph-up-arrow h3 m-0"></i>
-                    </div>
-                    <h5 class="card-title m-0">Análise de Performance</h5>
-                </div>
-                <p class="card-text">Upload de arquivos "Preventiva" e "Mobile" para análise de Performance.</p>
-                <a href="{{ url_for('rotas.analise_performance') }}" class="btn btn-primary w-100">Acessar Módulo</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-success text-white rounded p-3 me-3">
-                        <i class="bi bi-file-earmark-diff h3 m-0"></i>
-                    </div>
-                    <h5 class="card-title m-0">Análise Preventiva Completa</h5>
-                </div>
-                <p class="card-text">Execução do script de cruzamento de dados via Planilhas (Mobile, ESL, Bipes, Entrada de Carreta).</p>
-                <a href="{{ url_for('rotas.pagina_analise') }}" class="btn btn-success w-100">Acessar Módulo</a>
-            </div>
-        </div>
-    </div>
+<section class="dashboard-modulos">
+    <h2 class="h5 mb-3">Analisar e cruzar planilhas</h2>
 
-    <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-warning text-white rounded p-3 me-3">
-                        <i class="bi bi-search h3 m-0"></i>
+    <div class="row row-cols-1 row-cols-lg-2 g-4">
+
+        <!-- Análise com regras prontas -->
+        <div class="col">
+            <article class="card modulo-card modulo-automatico h-100">
+                <div class="card-body">
+                    <div class="modulo-cabecalho">
+                        <span class="modulo-icone" aria-hidden="true">
+                            <i class="bi bi-lightning-charge"></i>
+                        </span>
+
+                        <div>
+                            <span class="modulo-etiqueta">Rotina pronta</span>
+                            <h3 class="h5 mb-0">Preventiva automática</h3>
+                        </div>
                     </div>
-                    <h5 class="card-title m-0">Consultar Pedidos</h5>
+
+                    <p class="card-text">
+                        Envie as planilhas da rotina para reunir automaticamente
+                        as informações dos pedidos da preventiva.
+                    </p>
+
+                    <p class="modulo-orientacao">
+                        Os campos já estão definidos. Utilize os arquivos
+                        nos nomes e formatos esperados.
+                    </p>
+
+                    <a href="{{ url_for('rotas.pagina_analise') }}" class="btn modulo-botao">
+                        Analisar preventiva
+                        <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
+                    </a>
                 </div>
-                <p class="card-text">Busca de pedidos e Informações operacionais   </p> <br>
-                <a href="{{ url_for('rotas.rota_consulta') }}" class="btn btn-warning w-100">Acessar Módulo</a>
-            </div>
+            </article>
         </div>
+
+        <!-- Análise configurada pelo usuário -->
+        <div class="col">
+            <article class="card modulo-card modulo-personalizado h-100">
+                <div class="card-body">
+                    <div class="modulo-cabecalho">
+                        <span class="modulo-icone" aria-hidden="true">
+                            <i class="bi bi-intersect"></i>
+                        </span>
+
+                        <div>
+                            <span class="modulo-etiqueta">Você configura</span>
+                            <h3 class="h5 mb-0">Análise personalizada</h3>
+                        </div>
+                    </div>
+
+                    <p class="card-text">
+                        Escolha uma planilha principal e acrescente
+                        informações de outras planilhas conforme precisar.
+                    </p>
+
+                    <p class="modulo-orientacao">
+                        Você escolhe as colunas, as informações que deseja
+                        trazer e como relacionar os dados.
+                    </p>
+
+                    <a href="{{ url_for('cruzamento.index') }}" class="btn modulo-botao">
+                        Configurar análise
+                        <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </article>
+        </div>
+
     </div>
-    
-</div>
+</section>
+
+<section class="dashboard-modulos">
+    <h2 class="h5 mb-3">Acompanhar a operação</h2>
+
+    <div class="row row-cols-1 row-cols-lg-2 g-4">
+
+        <div class="col">
+            <article class="card modulo-card modulo-performance h-100">
+                <div class="card-body">
+                    <div class="modulo-cabecalho">
+                        <span class="modulo-icone" aria-hidden="true">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </span>
+
+                        <h3 class="h5 mb-0">Análise de performance</h3>
+                    </div>
+
+                    <p class="card-text">
+                        Compare a preventiva com o relatório Mobile
+                        para acompanhar os pedidos finalizados,
+                        as pendências e a meta.
+                    </p>
+
+                    <a href="{{ url_for('rotas.analise_performance') }}" class="btn modulo-botao">
+                        Consultar performance
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <div class="col">
+            <article class="card modulo-card modulo-consulta h-100">
+                <div class="card-body">
+                    <div class="modulo-cabecalho">
+                        <span class="modulo-icone" aria-hidden="true">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <h3 class="h5 mb-0">Consultar pedidos</h3>
+                    </div>
+
+                    <p class="card-text">
+                        Busque um pedido para consultar as informações
+                        disponíveis nas bases da operação.
+                    </p>
+
+                    <a href="{{ url_for('rotas.rota_consulta') }}" class="btn modulo-botao">
+                        Buscar pedido
+                    </a>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</section>
 {% endblock %}
