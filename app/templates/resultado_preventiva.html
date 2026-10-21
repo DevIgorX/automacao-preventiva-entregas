@@ -1,85 +1,35 @@
-{% extends "base_corporativo.html" %}
-
-{% block title %}Análise Preventiva{% endblock %}
-
-{% block content %}
-
-<body class="bg-light">
-
-    <div class="container mt-5">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-
-            <h2 class="mb-0">Resultado da Integração de Dados</h2>
-        
-            <div class="d-flex gap-2">
-        
-                <a href="{{ url_for('rotas.limpar_arquivo') }}"
-                    class="btn btn-outline-primary shadow-sm">
-                    <i class="fas fa-arrow-left me-1"></i> Nova Análise
-                </a>
-        
-                <a href="{{ url_for('rotas.baixar_relatorio_preventiva') }}"
-                    class="btn btn-success shadow-sm">
-                    <i class="fas fa-file-excel me-1"></i> Exportar Excel
-                </a>
-        
-            </div>
-        </div>
-
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-bordered">
-                        <thead class="table-dark">
-                            <tr>
-                                {% if dados.Excel | length > 0 %}
-                                {% for coluna in dados.Excel[0].keys() %}
-                                <th>{{ coluna }}</th>
-                                {% endfor %}
-                                {% else %}
-                                <th>Sem dados</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for linha in dados.Excel %}
-                            <tr>
-                                {% for valor in linha.values() %}
-                                <td>{{ valor }}</td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                {% if not dados %}
-                <div class="alert alert-warning mt-3">Nenhum dado encontrado no cruzamento.</div>
-                {% endif %}
-
-                <a href="{{url_for('rotas.limpar_arquivo')}}" class="btn btn-primary mt-3">Voltar</a>
-
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item {{ 'disabled' if dados.pagina_atual == 1 }}">
-                            <a class="page-link"
-                                href="{{ url_for('rotas.analisar_dados', pagina=dados.pagina_atual - 1) }}">Anterior</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">Página {{ dados.pagina_atual }} de {{ dados.total_paginas }}</span>
-                        </li>
-                        <li class="page-item {{ 'disabled' if dados.pagina_atual == dados.total_paginas }}">
-                            <a class="page-link"
-                                href="{{ url_for('rotas.analisar_dados', pagina=dados.pagina_atual + 1) }}">Próximo</a>
-                        </li>
-                    </ul>
-                </nav>
-
-            </div>
-        </div>
+{% extends 'base_modulo.html' %}
+{% from 'componentes/modulos.html' import cabecalho %}
+{% block title %}Resultado da preventiva · Porta-a-Porta{% endblock %}
+{% block modulo_tema %}tema-preventiva{% endblock %}
+{% block modulo_conteudo %}
+    {{ cabecalho('Resultado da preventiva', 'Confira as informações reunidas e baixe a planilha para continuar seu trabalho.', 'bi-lightning-charge', 'Rotina pronta') }}
+    <div class="modulo-acoes mb-4">
+        <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-outline-secondary">Nova análise</a>
+        <a href="{{ url_for('rotas.baixar_relatorio_preventiva') }}" class="btn btn-modulo"><i class="bi bi-download me-2" aria-hidden="true"></i>Baixar Excel</a>
     </div>
-
-</body>
-
+    <section class="card painel-modulo"><div class="card-body">
+        <h2 class="h5 mb-3">Informações dos pedidos</h2>
+        {% if dados.Excel %}
+            <div class="table-responsive tabela-preventiva" tabindex="0" aria-label="Resultado da preventiva; role para ver todas as colunas">
+                <table class="table table-striped table-hover">
+                    <thead><tr>{% for coluna in dados.Excel[0].keys() %}<th scope="col">{{ coluna }}</th>{% endfor %}</tr></thead>
+                    <tbody>{% for linha in dados.Excel %}<tr>{% for valor in linha.values() %}<td>{{ valor }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+                </table>
+            </div>
+            {% if dados.total_paginas > 1 %}
+                <nav class="mt-4" aria-label="Páginas do resultado"><ul class="pagination justify-content-center">
+                    <li class="page-item {% if dados.pagina_atual <= 1 %}disabled{% endif %}">
+                        {% if dados.pagina_atual > 1 %}<a class="page-link" href="{{ url_for('rotas.analisar_dados', pagina=dados.pagina_atual-1) }}">Anterior</a>{% else %}<span class="page-link">Anterior</span>{% endif %}
+                    </li>
+                    <li class="page-item"><span class="page-link" aria-current="page">Página {{ dados.pagina_atual }} de {{ dados.total_paginas }}</span></li>
+                    <li class="page-item {% if dados.pagina_atual >= dados.total_paginas %}disabled{% endif %}">
+                        {% if dados.pagina_atual < dados.total_paginas %}<a class="page-link" href="{{ url_for('rotas.analisar_dados', pagina=dados.pagina_atual+1) }}">Próxima</a>{% else %}<span class="page-link">Próxima</span>{% endif %}
+                    </li>
+                </ul></nav>
+            {% endif %}
+        {% else %}
+            <div class="estado-vazio"><i class="bi bi-search" aria-hidden="true"></i><p>Nenhum resultado disponível.</p><span>Confira os arquivos selecionados e faça uma nova análise.</span></div>
+        {% endif %}
+    </div></section>
 {% endblock %}
-

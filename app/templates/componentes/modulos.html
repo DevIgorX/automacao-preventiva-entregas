@@ -1,0 +1,22 @@
+{% macro cabecalho(titulo, descricao, icone, etiqueta) %}
+    <a href="{{ url_for('rotas.pagina_inicial') }}" class="modulo-voltar">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Página inicial
+    </a>
+    <header class="modulo-titulo">
+        <span class="modulo-simbolo" aria-hidden="true"><i class="bi {{ icone }}"></i></span>
+        <div>
+            <span class="modulo-legenda">{{ etiqueta }}</span>
+            <h1>{{ titulo }}</h1>
+            <p>{{ descricao }}</p>
+        </div>
+    </header>
+{% endmacro %}
+{% macro carregamento() %}
+    <div id="loader-overlay" class="style_loade" role="status" aria-live="polite">
+        <div class="modulo-carregando">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+            <h2 class="h5">Preparando sua análise</h2>
+            <p>Aguarde enquanto reunimos as informações das planilhas.</p>
+        </div>
+    </div>
+{% endmacro %}

@@ -1,12 +1,68 @@
-/* Área de prévia das planilhas */
-.cruzamento-previa {
-    max-height: 300px;
-    overflow: auto;
+/* Estilos exclusivos da Análise personalizada.
+   O padrão compartilhado vem de css_modulos/modulos.css. */
+   .tema-personalizada {
+    --modulo-cor: #4f46a5;
+    --modulo-suave: #eeecfa;
+    padding-top: .65rem;
 }
-
-/* Mantém o conteúdo das células em uma linha */
-.cruzamento-previa th,
-.cruzamento-previa td {
-    white-space: nowrap;
+.tema-personalizada .modulo-voltar {
+    min-height: 40px;
+    padding: .45rem .85rem;
+    margin-bottom: .75rem;
+    border: 1px solid #b8c4d1;
+    border-radius: 8px;
+    background: #fff;
+    font-weight: 600;
 }
-
+.tema-personalizada .modulo-voltar:hover {
+    background: var(--modulo-suave);
+    text-decoration: none;
+}
+.tema-personalizada .modulo-titulo { gap: .75rem; margin-bottom: 1rem; }
+.tema-personalizada .modulo-simbolo { width: 42px; height: 42px; border-radius: 10px; font-size: 1.25rem; }
+.tema-personalizada .modulo-titulo h1 { font-size: clamp(1.25rem, 2vw, 1.6rem); margin-bottom: .25rem; }
+.tema-personalizada .modulo-titulo p { font-size: .9rem; line-height: 1.4; }
+.tema-personalizada .modulo-titulo .modulo-legenda { display: none; }
+.tema-personalizada .cruzamento-previa { max-height: 300px; overflow: auto; }
+.tema-personalizada .cruzamento-previa th,
+.tema-personalizada .cruzamento-previa td { white-space: nowrap; }
+.tema-personalizada .cruzamento-previa th { position: sticky; top: 0; z-index: 1; }
+.personalizada-acoes {
+    position: sticky;
+    top: .5rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: .5rem .75rem;
+    margin-bottom: .75rem;
+    background: #fff;
+    border: 1px solid #dfe6ed;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0000000a;
+}
+.personalizada-status { color: #526174; font-size: .875rem; }
+.personalizada-status i { color: var(--modulo-cor); font-size: .5rem; vertical-align: middle; margin-right: .35rem; }
+.personalizada-acoes form { margin: 0; }
+.tema-personalizada .personalizada-acoes .btn { padding: .45rem .75rem; min-height: 40px; font-size: .875rem; }
+.personalizada-etapas { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: 1rem 0; font-size: .85rem; color: #596779; }
+.personalizada-etapas span { display: inline-flex; align-items: center; gap: .4rem; }
+.personalizada-etapas b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #edf1f5; }
+.personalizada-etapas .atual { font-weight: 600; color: var(--modulo-cor); }
+.personalizada-etapas .atual b { background: var(--modulo-cor); color: #fff; }
+.personalizada-etapas .concluida b { background: var(--modulo-suave); color: var(--modulo-cor); }
+.personalizada-aviso { padding: .75rem 1rem; background: var(--modulo-suave); border-left: 3px solid var(--modulo-cor); border-radius: 8px; color: #454362; font-size: .875rem; line-height: 1.5; }
+.personalizada-detalhes { padding: .75rem 1rem; border: 1px solid #dfe6ed; border-radius: 8px; }
+.personalizada-detalhes summary { cursor: pointer; font-weight: 600; color: #34495e; }
+.personalizada-detalhes[open] summary { margin-bottom: .75rem; }
+.personalizada-chaves { padding: .75rem; border-radius: 8px; background: #f8fafc; }
+.personalizada-colunas { border: 1px solid #dfe6ed; border-radius: 10px; }
+.personalizada-campo-nome, .personalizada-nome,
+.tema-personalizada strong { overflow-wrap: anywhere; }
+@media (max-width: 575px) {
+    .personalizada-status { display: none; }
+    .personalizada-acoes { justify-content: flex-end; }
+    .personalizada-etapas { gap: .5rem .75rem; }
+}

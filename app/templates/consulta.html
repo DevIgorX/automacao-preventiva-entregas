@@ -1,18 +1,22 @@
-{% extends 'base_corporativo.html' %}
+{% extends 'base_modulo.html' %}
+{% from 'componentes/modulos.html' import cabecalho %}
+{% block modulo_tema %}tema-consulta{% endblock %}
 {% block title %}Consulta de Pedido{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <div class="card shadow-sm mb-4">
+{% block modulo_conteudo %}
+{{ cabecalho('Consultar pedidos', 'Encontre as informações disponíveis de um pedido nas bases da operação.', 'bi-search', 'Acompanhar a operação') }}
+<div>
+    <div class="card painel-modulo mb-4">
         <div class="card-body">
-            <h2 class="mb-4">Histórico do Pedido</h2>
-            <form method="POST" class="row g-3">
+            <h2 class="h5 mb-3">Qual pedido você deseja consultar?</h2>
+            <form method="POST" class="row g-3 align-items-end">
                 <div class="col-md-8">
-                    <input type="text" name="pedido" class="form-control form-control-lg" 
+                    <label for="consulta-pedido" class="form-label">Número do pedido</label>
+                    <input id="consulta-pedido" type="text" name="pedido" class="form-control form-control-lg"
                            placeholder="Digite o número do pedido (ex: 123456789)" value="{{ pedido_procurado }}">
                 </div>
                 <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <button type="submit" class="btn btn-modulo w-100">
                         <i class="fas fa-search me-2"></i>Consultar Pedido
                     </button>
                 </div>
@@ -23,16 +27,16 @@
  {% if resultados %}
     <div class="alert alert-info shadow-sm d-flex align-items-center mb-4">
         <i class="fas fa-info-circle me-2 fs-5"></i>
-        <span>Foram encontradas <strong class="fs-5">{{ resultados|length }}</strong> ocorrências para este pedido.</span>
+        <span>Foram encontradas <strong class="fs-5">{{ resultados|length }}</strong> registro(s) para este pedido.</span>
     </div>
 
     <div class="row">
         {% for r in resultados %}
             <div class="col-12 mb-4">
                 <div class="card shadow-sm border-0 border-start border-primary border-4">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                    <div class="card-header registro-cabecalho bg-light d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0 text-dark fw-bold">
-                            <i class="fas fa-route me-2 text-primary"></i>Histórico #{{ loop.index }}
+                            <i class="fas fa-route me-2 text-primary"></i>Registro #{{ loop.index }}
                         </h5>
                         <div class="d-flex gap-2">
                             <span class="badge bg-primary px-3 py-2 fs-6 shadow-sm">{{ r.Mobile_Tipo }}</span>
@@ -43,13 +47,13 @@
                     </div>
                     <div class="card-body py-4">
                         <div class="row g-4">
-                            
+
                             <div class="col-md-3 border-end">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="bg-primary bg-opacity-10 p-2 rounded me-2">
                                         <i class="fas fa-mobile-alt text-primary fs-5"></i>
                                     </div>
-                                    <h6 class="text-primary fw-bold mb-0">📱 Dados Mobile</h6>
+                                    <h6 class="text-primary fw-bold mb-0">Mobile Entregas</h6>
                                 </div>
                                 <div class="mb-2">
                                     <small class="text-muted d-block">Status</small>
@@ -71,7 +75,7 @@
                                     <div class="bg-secondary bg-opacity-10 p-2 rounded me-2">
                                         <i class="fas fa-warehouse text-secondary fs-5"></i>
                                     </div>
-                                    <h6 class="text-secondary fw-bold mb-0">🏢 Sistema ESL</h6>
+                                    <h6 class="text-secondary fw-bold mb-0">Sistema ESL</h6>
                                 </div>
                                 {% if r['Esl_Ocorrência/Ocorrência'] != 'Ocorrencia Interna' %}
                                     <div class="mb-2">
@@ -84,7 +88,7 @@
                                         <span class="fw-semibold text-dark">{{ r['Esl_Última Ocorrência/Observações'] or '-' }}</span>
                                     </div>
                                 {% endif %}
-            
+
                                 <div class="mb-2">
                                     <small class="text-muted d-block">Motorista</small>
                                     <span class="fw-semibold text-dark">{{ r['Esl_Pessoa/Nome'] or '-' }}</span>
@@ -106,7 +110,7 @@
                                     <div class="bg-success bg-opacity-10 p-2 rounded me-2">
                                         <i class="fas fa-truck text-success fs-5"></i>
                                     </div>
-                                    <h6 class="text-success fw-bold mb-0">🚛 Controle Carreta</h6>
+                                    <h6 class="text-success fw-bold mb-0">Entrada de Carreta</h6>
                                 </div>
                                 <div class="mb-2">
                                     <small class="text-muted d-block">Fluxo</small>
@@ -130,7 +134,7 @@
                                     <div class="bg-dark bg-opacity-10 p-2 rounded me-2">
                                         <i class="fas fa-info-circle text-dark fs-5"></i>
                                     </div>
-                                    <h6 class="text-dark fw-bold mb-0">⚙️ Informações Gerais</h6>
+                                    <h6 class="text-dark fw-bold mb-0">Informações gerais</h6>
                                 </div>
                                 <div class="row g-2 mb-2">
                                     <div class="col-6">
@@ -171,6 +175,8 @@
         <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
         <span>Nenhum registro encontrado para o pedido <strong>{{ pedido_procurado }}</strong>.</span>
     </div>
+ {% else %}
+    <div class="estado-vazio"><i class="bi bi-search" aria-hidden="true"></i><p>As informações do pedido aparecerão aqui.</p><span>Digite o número acima e selecione Consultar pedido.</span></div>
  {% endif %}
 </div>
 {% endblock %}

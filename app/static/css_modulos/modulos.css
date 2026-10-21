@@ -1,0 +1,133 @@
+/* Componentes compartilhados pelas telas operacionais. */
+.modulo-pagina {
+    --modulo-cor: #34495e;
+    --modulo-suave: #edf1f5;
+    max-width: 1440px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 1.25rem 0 2.5rem;
+    color: #263548;
+}
+.tema-preventiva { --modulo-cor: #187447; --modulo-suave: #eaf6ef; }
+.tema-consulta { --modulo-cor: #865600; --modulo-suave: #fff5dc; }
+.modulo-voltar { display: inline-flex; gap: .5rem; align-items: center; margin-bottom: 1.5rem; color: #526174; text-decoration: none; font-size: .875rem; }
+.modulo-voltar:hover { color: var(--modulo-cor); text-decoration: underline; }
+.modulo-titulo { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 2rem; }
+.modulo-simbolo { display: grid; place-items: center; flex-shrink: 0; width: 56px; height: 56px; border-radius: 14px; background: var(--modulo-suave); color: var(--modulo-cor); font-size: 1.6rem; }
+.modulo-legenda { display: block; color: var(--modulo-cor); font-weight: 600; font-size: .8rem; margin-bottom: .35rem; }
+.modulo-titulo h1 { font-size: clamp(1.45rem, 2.5vw, 1.9rem); font-weight: 650; margin: 0 0 .5rem; }
+.modulo-titulo p { margin: 0; color: #596779; line-height: 1.6; max-width: 760px; }
+.modulo-pagina .card { border: 1px solid #dfe6ed; border-radius: 12px; box-shadow: 0 3px 12px rgb(0 0 0 / 4%); }
+.modulo-pagina .card:hover { transform: none; }
+.modulo-pagina .painel-modulo { border-top: 3px solid var(--modulo-cor); }
+.modulo-pagina .card-body { padding: 1.5rem; }
+.modulo-pagina .card-header { padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; border-radius: 11px 11px 0 0; }
+.painel-ajuda { background: #f8fafc; border: 1px solid #dfe6ed; border-radius: 12px; padding: 1.5rem; line-height: 1.7; color: #526174; }
+.painel-ajuda h2 { color: #263548; line-height: 1.5; }
+.lista-orientacoes { padding-left: 1.15rem; margin: 1rem 0 1.4rem; }
+.lista-orientacoes li { padding: .2rem 0; }
+.arquivo-campo { padding: 1.1rem; border: 1px solid #dfe6ed; background: #f8fafc; border-radius: 10px; margin: 1.25rem 0; }
+.arquivo-campo .form-label { font-weight: 600; }
+.arquivo-campo p { font-size: .875rem; color: #596779; }
+.etapa-numero { display: inline-grid; place-items: center; width: 26px; height: 26px; background: var(--modulo-suave); color: var(--modulo-cor); border-radius: 8px; margin-right: .4rem; font-size: .85rem; font-weight: 700; }
+.modulo-acoes, .modulo-linha { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem; }
+.modulo-acoes { margin-top: 1.5rem; }
+.modulo-pagina .btn { border-radius: 8px; padding: .65rem 1rem; font-weight: 600; }
+.modulo-pagina .btn-modulo { color: #fff; background: var(--modulo-cor); border: 1px solid var(--modulo-cor); }
+.modulo-pagina .btn-modulo:hover { color: var(--modulo-cor); background: var(--modulo-suave); }
+.modulo-pagina :is(a, button, input, select):focus-visible { outline: 3px solid #215bc1; outline-offset: 3px; }
+.arquivo-feedback { margin-top: .75rem; font-size: .875rem; }
+.contagem-arquivos { background: var(--modulo-suave); color: var(--modulo-cor); border-radius: 6px; padding: .4rem .6rem; font-size: .8rem; }
+.lista-arquivos { list-style: none; padding: 0; margin: 1.25rem 0; }
+.lista-arquivos li { display: flex; gap: .75rem; padding: .8rem; border-bottom: 1px solid #e2e8f0; }
+.lista-arquivos span { overflow-wrap: anywhere; }
+.lista-arquivos i { color: var(--modulo-cor); }
+.estado-vazio { padding: 2rem 1rem; text-align: center; color: #596779; }
+.estado-vazio > i { display: block; font-size: 2rem; margin-bottom: .75rem; color: var(--modulo-cor); }
+.estado-vazio p { margin-bottom: .3rem; font-weight: 600; }
+.estado-vazio span { font-size: .875rem; }
+.modulo-pagina .table-responsive { border: 1px solid #e2e8f0; border-radius: 10px; }
+.modulo-pagina .table { margin-bottom: 0; font-size: .875rem; --bs-table-striped-bg: #f8fafc; }
+.modulo-pagina .table th { background: #edf1f5; color: #34495e; font-weight: 600; padding: .9rem 1rem; border-color: #dfe6ed; }
+.modulo-pagina .table td { padding: .8rem 1rem; vertical-align: middle; }
+.tabela-preventiva { max-height: 60vh; }
+.tabela-preventiva th, .tabela-preventiva td { white-space: nowrap; }
+.modulo-pagina .pagination { flex-wrap: wrap; gap: .25rem; }
+.modulo-pagina .page-link { color: var(--modulo-cor); }
+.modulo-pagina .alert { border-radius: 10px; }
+.modulo-pagina .registro-cabecalho { flex-wrap: wrap; gap: .75rem; }
+.modulo-pagina .badge { white-space: normal; text-align: left; line-height: 1.5; }
+.modulo-pagina .bg-warning { color: #493400 !important; }
+.modulo-pagina .card-clickable { cursor: pointer; }
+.modulo-pagina .card-clickable.active { outline: 3px solid #215bc1; outline-offset: 2px; }
+.modulo-pagina .filter-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.modulo-pagina .filter-icon { cursor: pointer; color: #34495e; }
+.modulo-pagina .filter-dropdown-menu { max-height: 280px; min-width: 240px; overflow-y: auto; padding: .75rem; }
+.modulo-pagina .filter-option { padding: .25rem 0 .25rem 1.5rem; }
+.tabela-performance { min-height: 300px; }
+.meta-nota { font-size: .85rem; opacity: .95; }
+.modulo-carregando { background: #fff; border-radius: 14px; padding: 2rem; text-align: center; max-width: 400px; box-shadow: 0 12px 40px #0002; }
+.modulo-carregando > i { font-size: 2rem; color: var(--modulo-cor); display: block; margin-bottom: 1rem; }
+@media (max-width: 767px) {
+    .modulo-pagina .card-body, .painel-ajuda { padding: 1rem; }
+    .modulo-pagina .border-end { border-right: 0 !important; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; }
+    .modulo-acoes > *, .modulo-acoes form .btn { width: 100%; }
+    .modulo-titulo { gap: .75rem; }
+    .modulo-simbolo { width: 44px; height: 44px; font-size: 1.25rem; }
+}
+
+/* Cabeçalho mais compacto */
+.modulo-pagina {
+    padding-top: 0.65rem;
+}
+
+.modulo-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.45rem 0.85rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #b8c4d1;
+    border-radius: 8px;
+    background: #fff;
+    color: #34495e;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.modulo-voltar:hover {
+    background: #edf1f5;
+    border-color: #34495e;
+    color: #263548;
+    text-decoration: none;
+}
+
+.modulo-titulo {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.modulo-simbolo {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    font-size: 1.25rem;
+}
+
+.modulo-titulo h1 {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    margin-bottom: 0.25rem;
+}
+
+.modulo-titulo p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Retira a frase pequena acima do título.
+   O título e a descrição já explicam a função. */
+.modulo-titulo .modulo-legenda {
+    display: none;
+}

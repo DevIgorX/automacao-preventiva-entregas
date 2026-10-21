@@ -1,47 +1,46 @@
-{% extends "base_corporativo.html" %}
-
-{% block content %}
-
-<div id="loader-overlay" class="style_loade">
-    <div class="text-center">
-        <i class="fas fa-spinner fa-spin fa-4x text-primary mb-3"></i>
-        <h4 class="text-dark">Processando dados...</h4>
-    </div>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2 text-dark"><i class="bi bi-graph-up-arrow me-2"></i>Análise de Performance</h1>
-</div>
-
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-1">
-            <div class="card-header bg-white py-3">
-                <h5 class="card-title mb-0 text-primary">Upload de Arquivos</h5>
-                <small class="text-muted">Selecione os arquivos específicos para gerar a análise de performance.</small>
-            </div>
-            <div class="card-body p-4">
-                <form id="form-analise" action="{{ url_for('rotas.analise_performance') }}" method="POST" enctype="multipart/form-data">
-                    
-                    <div class="mb-4">
-                        <label for="preventiva" class="form-label fw-bold text-secondary">Planilha de Preventiva (CD Etapa)</label>
-                        <input type="file" name="preventiva" id="preventiva" class="form-control" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="relatorio" class="form-label fw-bold text-secondary">Relatório Mobile Entregas</label>
-                        <input type="file" name="relatorio" id="relatorio" class="form-control" required>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{{ url_for('rotas.pagina_inicial') }}" class="btn btn-outline-danger px-4">Limpar Arquivos</a>
-                        <button type="submit" class="btn btn-primary px-5">
-                            <i class="bi bi-cpu me-2"></i>Processar Performance
-                        </button>
-                    </div>
-                </form>
-            </div>
+{% extends 'base_modulo.html' %}
+{% from 'componentes/modulos.html' import cabecalho, carregamento %}
+{% block title %}Análise de performance · Porta-a-Porta{% endblock %}
+{% block modulo_tema %}tema-performance{% endblock %}
+{% block modulo_conteudo %}
+    {{ carregamento() }}
+    {{ cabecalho('Análise de performance', 'Acompanhe as entregas finalizadas, as pendências e o avanço até a meta.', 'bi-graph-up-arrow', 'Acompanhar a operação') }}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <section class="card painel-modulo">
+                <div class="card-body">
+                    <h2 class="h5">Selecione as duas planilhas</h2>
+                    <p class="text-muted">Utilize os relatórios correspondentes ao período que deseja analisar.</p>
+                    <form id="form-analise" action="{{ url_for('rotas.analise_performance') }}" method="POST" enctype="multipart/form-data">
+                        <div class="arquivo-campo">
+                            <label for="preventiva" class="form-label"><span class="etapa-numero">1</span> Preventiva</label>
+                            <p id="ajuda-preventiva">Lista dos pedidos que você deseja acompanhar (Preventiva).</p>
+                            <input type="file" name="preventiva" id="preventiva" class="form-control" aria-describedby="ajuda-preventiva" required>
+                        </div>
+                        <div class="arquivo-campo">
+                            <label for="relatorio" class="form-label"><span class="etapa-numero">2</span> Mobile Entregas</label>
+                            <p id="ajuda-mobile">Relatório com a situação das entregas (Mobile).</p>
+                            <input type="file" name="relatorio" id="relatorio" class="form-control" aria-describedby="ajuda-mobile" required>
+                        </div>
+                        <div class="modulo-acoes">
+                            <a href="{{ url_for('rotas.pagina_inicial') }}" class="btn btn-outline-secondary">Voltar</a>
+                            <button type="submit" class="btn btn-modulo"><i class="bi bi-graph-up-arrow me-2" aria-hidden="true"></i>Analisar performance</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
+        <aside class="col-lg-4">
+            <div class="painel-ajuda">
+                <span class="modulo-legenda">O que você vai encontrar</span>
+                <h2 class="h5">Uma visão do andamento das entregas</h2>
+                <ul class="lista-orientacoes">
+                    <li>Total de pedidos e quantidade de finalizados.</li>
+                    <li>Pendências para acompanhar com a equipe.</li>
+                    <li>Performance atual e distância até a meta.</li>
+                </ul>
+                <p class="mb-0">Ao terminar, você poderá baixar o relatório em Excel.</p>
+            </div>
+        </aside>
     </div>
-</div>
 {% endblock %}

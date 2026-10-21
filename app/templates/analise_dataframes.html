@@ -1,89 +1,59 @@
-{% extends "base_corporativo.html" %}
-
-{% block title %}Análise Preventiva{% endblock %}
-
-{% block content %}
-
-<div id="loader-overlay" class="style_loade">
-    <div class="text-center">
-        <i class="fas fa-spinner fa-spin fa-4x text-primary mb-3"></i>
-        <h4 class="text-dark">Processando dados...</h4>
-    </div>
-</div>
-
-</div>
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h2 text-dark"><i class="bi bi-cpu me-2"></i>Portal de Inteligência Logística</h1>
-</div>
-
-<div class="row justify-content-center">
-    <div class="col-lg-9">
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white py-3 border-bottom">
-                <div class="d-flex align-items-center" >
-                    <i class="bi bi-truck text-primary fs-3 me-3"></i>
-                    <div>
-                        <h5 class="mb-0">Análise e Cruzamento Automático de Dados</h5>
-                        <small class="text-muted">Carregue os arquivos diários de <strong>Preventiva, Carreta, ESL, Mobile e Bipes</strong> para consolidar as Informações</small>
-                    </div>
+{% extends 'base_modulo.html' %}
+{% from 'componentes/modulos.html' import cabecalho, carregamento %}
+{% block title %}Preventiva automática · Porta-a-Porta{% endblock %}
+{% block modulo_tema %}tema-preventiva{% endblock %}
+{% block modulo_conteudo %}
+    {{ carregamento() }}
+    {{ cabecalho('Preventiva automática', 'Reúna as informações dos pedidos usando as planilhas da rotina.', 'bi-lightning-charge', 'Rotina pronta') }}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <section class="card painel-modulo mb-4">
+                <div class="card-body">
+                    <h2 class="h5"><span class="etapa-numero">1</span> Envie as planilhas</h2>
+                    <p class="text-muted">Selecione um ou mais arquivos. Você pode fazer novos envios antes de analisar.</p>
+                    <form method="POST" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data">
+                        <div class="arquivo-campo">
+                            <label for="arquivos" class="form-label">Arquivos da análise</label>
+                            <input class="form-control" type="file" id="arquivos" name="arquivos" accept=".xlsx,.xls" multiple required>
+                            <div id="file-list" class="arquivo-feedback" aria-live="polite"></div>
+                        </div>
+                        <div class="modulo-acoes"><button type="submit" class="btn btn-modulo"><i class="bi bi-upload me-2" aria-hidden="true"></i>Enviar planilhas</button></div>
+                    </form>
                 </div>
-            </div>
-
-            <div class="card-body p-4">
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small text-uppercase">
-                        <i class="fas fa-folder-open me-2 text-warning"></i>Arquivos já enviados:
-                    </label>
-
-                    <div class="d-flex flex-wrap gap-2 p-3 bg-light rounded border border-dashed">
+            </section>
+            <section class="card painel-modulo">
+                <div class="card-body">
+                    <div class="modulo-linha">
+                        <h2 class="h5 mb-0"><span class="etapa-numero">2</span> Confira e analise</h2>
+                        <span class="contagem-arquivos">{{ arquivos_presentes|length }} arquivo(s) enviado(s)</span>
+                    </div>
+                    <div class="arquivos-enviados">
                         {% if arquivos_presentes %}
-                            {% for arq in arquivos_presentes %}
-                            <span class="badge bg-white text-dark border shadow-sm p-2">
-                                <i class="fas fa-file-excel text-success me-1"></i> {{ arq }}
-                            </span>
-                            {% endfor %}
+                            <ul class="lista-arquivos">
+                                {% for arq in arquivos_presentes %}<li><i class="bi bi-file-earmark-spreadsheet" aria-hidden="true"></i><span>{{ arq }}</span></li>{% endfor %}
+                            </ul>
                         {% else %}
-                            <span class="text-muted small italic">Nenhum arquivo enviado ainda.</span>
+                            <div class="estado-vazio"><i class="bi bi-folder2-open" aria-hidden="true"></i><p>Nenhum arquivo enviado nesta etapa.</p><span>Use o formulário acima para selecionar suas planilhas.</span></div>
                         {% endif %}
                     </div>
+                    <div class="modulo-acoes">
+                        <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-outline-danger">Limpar arquivos</a>
+                        <form id="form-analise" method="GET" action="{{ url_for('rotas.conferencia_qtd_arquivos') }}">
+                            <input type="hidden" name="processar" value="true">
+                            <button type="submit" class="btn btn-modulo"><i class="bi bi-lightning-charge me-2" aria-hidden="true"></i>Analisar preventiva</button>
+                        </form>
+                    </div>
                 </div>
-
-                <form method="POST" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data" class="mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label for="arquivos" class="form-label fw-bold text-dark mb-0">
-                            <i class="far fa-file-excel me-2 text-success"></i>
-                            Arquivos de Entrada (.xlsx)
-                        </label>
-                        <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash me-1"></i> Limpar Tudo
-                        </a>
-                    </div>
-                    
-                    <div class="upload-area style_area p-5 text-center border rounded mb-3" id="upload-area">
-                        <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
-                        <h5 class="mt-2">Clique ou arraste os arquivos aqui</h5>
-                        <input type="file" id="arquivos" name="arquivos" accept=".xlsx,.xls" multiple required style="display: none;">
-                        <div id="file-list" class="mt-2 fw-bold text-primary small"></div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2">
-                        <i class="bi bi-send me-2"></i>Enviar para o Servidor
-                    </button>
-                </form>
-
-                <hr class="my-4">
-
-                <form id="form-analise" method="GET" action="{{ url_for('rotas.conferencia_qtd_arquivos') }}">
-                    <input type="hidden" name="processar" value="true">
-                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
-                        <i class="bi bi-gear-fill me-2"></i>PROCESSAR E GERAR RELATÓRIO
-                    </button>
-                </form>
-            </div>
+            </section>
         </div>
+        <aside class="col-lg-4">
+            <div class="painel-ajuda">
+                <span class="modulo-legenda">Antes de começar</span>
+                <h2 class="h5">Use os arquivos da rotina</h2>
+                <ul class="lista-orientacoes"><li>Preventiva</li><li>Entrada de Carreta</li><li>Relatório ESL</li><li>Mobile Entregas</li><li>Bipe de produtos</li><li>Bipe de notas</li></ul>
+                <p>Este módulo utiliza nomes, abas e colunas já definidos. Mantenha o padrão habitual dos arquivos.</p>
+                <p class="mb-0">Precisa escolher outras colunas? Use a <a href="{{ url_for('cruzamento.index') }}">Análise personalizada</a>.</p>
+            </div>
+        </aside>
     </div>
-</div>
 {% endblock %}
-
-
-

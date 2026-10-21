@@ -1,0 +1,10 @@
+{% extends 'base_corporativo.html' %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css_modulos/modulos.css') }}">
+{% endblock %}
+{% block content %}
+    <div class="modulo-pagina {% block modulo_tema %}{% endblock %}">
+        {% block modulo_conteudo %}{% endblock %}
+    </div>
+{% endblock %}
