@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import sys
 import locale
+import re
 
 
 caminho_script = os.path.abspath(__file__)
@@ -13,6 +14,35 @@ caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
 
 from app.utils import formatar_colunas, formatar_coluna_pedidos , formatar_coluna_data
 from db.db_preventiva import buscar_ultimo_raw, salvar_dados_base
+
+
+def preservar_chaves_fiscais(df, coluna, fonte):
+    """Preserva o identificador completo e rejeita chaves já numéricas/inválidas."""
+    if coluna not in df.columns:
+        raise ValueError(f"{fonte}: coluna de chave fiscal não encontrada: {coluna}")
+
+    chaves = []
+    linhas_invalidas = []
+    for linha_excel, valor in enumerate(df[coluna], start=2):
+        if pd.isna(valor) or (isinstance(valor, str) and not valor.strip()):
+            chaves.append(None)
+        elif isinstance(valor, str) and re.fullmatch(r"[0-9]{44}", valor.strip()):
+            chaves.append(valor.strip())
+        else:
+            linhas_invalidas.append(linha_excel)
+            chaves.append(None)
+
+    if linhas_invalidas:
+        exemplos = ", ".join(map(str, linhas_invalidas[:5]))
+        raise ValueError(
+            f"{fonte}: {len(linhas_invalidas)} chave(s) inválida(s) na coluna {coluna}. "
+            f"Confira as linhas {exemplos} do Excel. "
+            "As chaves precisam ter 44 dígitos e estar armazenadas como texto na origem. "
+            "Se já foram convertidas em número, obtenha novamente as chaves completas; "
+            "apenas mudar a formatação da célula não recupera dígitos perdidos."
+        )
+    df[coluna] = pd.Series(chaves, index=df.index, dtype=object)
+    return df
 
 
 df_preventiva = df_carreta = df_esl = df_mobile = df_bipe = df_bipe_notas = None
@@ -29,17 +59,19 @@ for arquivo in os.listdir(caminho_dados):
         salvar_dados_base(df_preventiva, "raw_preventiva", coluna_chave="Preventiva_Pedido 1P/Full")
         
     elif 'Carreta' in arquivo:
-        df_carreta = pd.read_excel(caminho_arquivo)
+        df_carreta = pd.read_excel(caminho_arquivo, dtype=object)
         df_carreta = formatar_colunas(df_carreta)
         df_carreta = df_carreta.add_prefix('Carreta_')
+        df_carreta = preservar_chaves_fiscais(df_carreta, 'Carreta_Chave', arquivo)
         df_carreta = formatar_coluna_pedidos(df_carreta,'Carreta_Pedido')
         df_carreta = formatar_coluna_pedidos(df_carreta,'Carreta_Nf`S')
         salvar_dados_base(df_carreta,'raw_carreta', coluna_chave='Carreta_Pedido')
         
     elif 'magazine' in arquivo:
-        df_esl = pd.read_excel(caminho_arquivo)
+        df_esl = pd.read_excel(caminho_arquivo, dtype=object)
         df_esl = formatar_colunas(df_esl)
         df_esl = df_esl.add_prefix('Esl_')
+        df_esl = preservar_chaves_fiscais(df_esl, 'Esl_Nota Fiscal/Chave Nf-E', arquivo)
         salvar_dados_base(df_esl, "raw_esl", coluna_chave="Esl_Nota Fiscal/Chave Nf-E")
 
         
