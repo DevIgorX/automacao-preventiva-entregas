@@ -45,6 +45,49 @@ def preservar_chaves_fiscais(df, coluna, fonte):
     return df
 
 
+def normalizar_identificador_mobile(valor):
+    """Normaliza números de pedido/NF sem confundir vazio com zero."""
+    if pd.isna(valor):
+        return ''
+    texto = str(valor).strip()
+    if re.fullmatch(r'[0-9]+(?:\.0+)?', texto):
+        return str(int(texto.split('.')[0]))
+    return texto
+
+
+def cruzar_mobile(base, mobile):
+    """Busca por pedido; tenta NF quando nenhum dado do Mobile foi encontrado."""
+    fonte = mobile.copy()
+    fonte['_mobile_pedido'] = fonte['Mobile_Pedido'].map(normalizar_identificador_mobile)
+    fonte['_mobile_nf'] = fonte['Mobile_Nota Fiscal'].map(normalizar_identificador_mobile)
+    dados = ['Mobile_Tipo', 'Mobile_Entregador']
+    resultado = base.copy()
+    resultado['_mobile_pedido'] = resultado['Preventiva_Pedido 1P/Full'].map(normalizar_identificador_mobile)
+
+    # Mantém o resultado por pedido quando houver alguma informação.
+    resultado = resultado.merge(
+        fonte.loc[fonte['_mobile_pedido'].ne(''), ['_mobile_pedido'] + dados],
+        on='_mobile_pedido', how='left', sort=False
+    )
+    sem_informacao = resultado[dados].apply(
+        lambda coluna: coluna.fillna('').astype(str).str.strip().eq('')
+    ).all(axis=1)
+
+    # Não escolhe arbitrariamente entre registros conflitantes para a mesma NF.
+    candidatos = fonte.loc[fonte['_mobile_nf'].ne(''),
+                           ['_mobile_nf', '_mobile_pedido'] + dados].drop_duplicates()
+    contagens = candidatos.groupby('_mobile_nf', sort=False).size()
+    ambiguas = set(contagens[contagens.gt(1)].index)
+    unicos = candidatos.loc[~candidatos['_mobile_nf'].isin(ambiguas)].set_index('_mobile_nf')
+    nf_base = resultado['Carreta_Nf`S'].map(normalizar_identificador_mobile)
+    tentar_nf = sem_informacao & nf_base.ne('')
+    encontrado_nf = tentar_nf & nf_base.isin(unicos.index)
+    for coluna in dados:
+        resultado.loc[encontrado_nf, coluna] = nf_base.loc[encontrado_nf].map(unicos[coluna])
+    resultado[dados] = resultado[dados].fillna('')
+    return resultado.drop(columns=['_mobile_pedido'])
+
+
 df_preventiva = df_carreta = df_esl = df_mobile = df_bipe = df_bipe_notas = None
 
 for arquivo in os.listdir(caminho_dados):
@@ -75,8 +118,8 @@ for arquivo in os.listdir(caminho_dados):
         salvar_dados_base(df_esl, "raw_esl", coluna_chave="Esl_Nota Fiscal/Chave Nf-E")
 
         
-    elif 'Mobile' in arquivo:
-        df_mobile = pd.read_excel(caminho_arquivo)
+    elif 'Mobile' in arquivo or 'entregas' in arquivo:
+        df_mobile = pd.read_excel(caminho_arquivo, dtype=object)
         df_mobile = formatar_colunas(df_mobile)
         df_mobile = df_mobile.add_prefix('Mobile_')
         df_mobile = formatar_coluna_pedidos(df_mobile, 'Mobile_Pedido')
@@ -142,14 +185,7 @@ df_final = (
         )
         .drop(columns=['Carreta_Pedido'])
 
-        .merge(
-            # Ajuste: Prefixo 'Mobile_' + Title Case
-            df_mobile[['Mobile_Pedido', 'Mobile_Tipo', 'Mobile_Entregador']],
-            left_on='Preventiva_Pedido 1P/Full',
-            right_on='Mobile_Pedido',
-            how='left'
-        )
-        .drop(columns=['Mobile_Pedido'])
+        .pipe(cruzar_mobile, df_mobile)
 
         .merge(
             # Ajuste: Prefixo 'Esl_' + Title Case (inclusive em siglas como NF-E -> Nf-E)
