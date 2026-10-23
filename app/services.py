@@ -86,103 +86,38 @@ def login():
     form = FormularioLogin()
     return render_template('login.html', form=form)
 
+# O envio guiado fica separado das regras de negócio e dos demais módulos.
 def pagina_analise_preventiva():
-    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
-
-    arquivos_no_servidor = []
-
-    if os.path.exists(pasta_dados):
-        for arquivo in os.listdir(pasta_dados):
-            if arquivo != '.gitkeep':
-                arquivos_no_servidor.append(arquivo)
-
-    
-
-    return render_template('analise_dataframes.html', arquivos_presentes=arquivos_no_servidor)
+    from .preventiva_uploads import pagina
+    return pagina()
 
 
 def adicionar_arquivo(request):
-    arquivos = request.files.getlist('arquivos')
-
-    if not arquivos:
-        flash("Nenhum arquivo enviado!","danger")
-        return redirect(url_for('rotas.pagina_analise'))
-
-    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
-
-    arquivos_pulados = []
-    for arquivo in arquivos:
-        caminho_completo = os.path.join(pasta_dados, arquivo.filename)
-
-        if os.path.exists(caminho_completo):
-            arquivos_pulados.append(caminho_completo)
-            continue
-
-        arquivo.save(caminho_completo)
-    
-    if arquivos_pulados:
-        flash(f"Você já selecionou esse arquivo. Verifique e tente novamente.", "warning") # flash(mensagem, categoria)"warning" → cor amarelo (atenção)
-    else:
-        flash("Arquivo enviado com sucesso!", "success") #success cor verde
-
-    return redirect(url_for('rotas.pagina_analise'))
+    from .preventiva_uploads import acao_upload
+    return acao_upload()
 
 
 def conferencia_arquivos():
-    
-    return redirect(url_for('rotas.analisar_dados', processar='true'))
+    # Endereço antigo: o processamento agora é iniciado pelo formulário POST.
+    return redirect(url_for('rotas.pagina_analise'))
 
 
 def analisar_preventiva(request):
-    pagina = request.args.get('pagina', 1, type=int)
-    processar = request.args.get('processar', 'false').lower() == 'true'
+    from .preventiva_uploads import executar, resultado_pagina
+    if request.method == 'POST':
+        return executar()
+    return resultado_pagina()
 
-    if processar:
-        diretorio_raiz = current_app.config['ROOT_DIR']
-        pasta_analise = os.path.join(diretorio_raiz, 'analise') 
-        caminho_script = os.path.join(pasta_analise, 'analise_preventiva.py')
-        encoding_padrao = locale.getpreferredencoding(False)
-        
-       
-        resultado = subprocess.run(['python', caminho_script], capture_output=True, text=True, encoding=encoding_padrao)
-
-        if resultado.returncode != 0:
-            return render_template('erro.html', erro=resultado.stderr)
-
-    itens_por_pg = 5
-    try:
-        lista_dados, total_itens = buscar_dados_paginados(pagina, itens_por_pg)
-    except Exception as e:
-        
-        return render_template('erro.html', erro=f"Erro ao buscar dados: {e}")
-    
-    total_paginas = (total_itens + itens_por_pg - 1) // itens_por_pg
-
-    dados_formatados = {
-        "Excel": lista_dados,
-        "pagina_atual": pagina,
-        "total_paginas": total_paginas
-    }
-
-    return render_template('resultado_preventiva.html', dados=dados_formatados)
 
 def excluir_arquivos():
-    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
+    from .preventiva_uploads import nova_analise
+    return nova_analise()
 
-    for arquivo in os.listdir(pasta_dados):
-        caminho_arquivo = os.path.join(pasta_dados, arquivo)
-        if arquivo != '.gitkeep':
-            os.remove(caminho_arquivo)
-    
-    return redirect(url_for('rotas.pagina_analise'))
-       
+
 def baixar_preventiva():
-    pasta_dados = current_app.config['UPLOAD_FOLDER_PREVENTIVA']
+    from .preventiva_uploads import baixar
+    return baixar()
 
-    data_hoje = datetime.today().strftime('%d-%m-%Y')
-    nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
-
-    return send_from_directory(pasta_dados, nome_arquivo, as_attachment=True)
 
 def pagina_consulta(request):
     resultados = []

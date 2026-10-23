@@ -1,0 +1,21 @@
+/* Estilos apenas do envio guiado; mantém os componentes comuns dos módulos. */
+.preventiva-envio .envio-checklist { list-style: none; margin: 0; padding: 0; }
+.preventiva-envio .envio-item { display: flex; align-items: flex-start; gap: .8rem; padding: .85rem .5rem; border-bottom: 1px solid #e2e8f0; }
+.preventiva-envio .envio-item:last-child { border-bottom: 0; }
+.preventiva-envio .envio-icone { color: #778495; font-size: 1.15rem; line-height: 1.4; }
+.preventiva-envio .envio-recebido .envio-icone, .preventiva-envio .envio-status { color: var(--modulo-cor); }
+.preventiva-envio .envio-identificacao { flex: 1; min-width: 0; }
+.preventiva-envio .envio-identificacao h3 { display: inline; margin: 0 .6rem 0 0; font-size: .95rem; font-weight: 650; }
+.preventiva-envio .envio-status, .preventiva-envio .envio-faltando { display: inline-block; font-size: .8rem; }
+.preventiva-envio .envio-status { background: var(--modulo-suave); border-radius: 5px; padding: .15rem .4rem; }
+.preventiva-envio .envio-faltando { color: #596779; }
+.preventiva-envio .envio-nome { font-size: .8rem; color: #596779; overflow-wrap: anywhere; margin: .3rem 0; }
+.preventiva-envio .envio-substituicao summary { display: list-item; width: fit-content; cursor: pointer; border: 1px solid #b8c4d1; border-radius: 6px; background: #fff; padding: .3rem .6rem; font-size: .8rem; color: #34495e; }
+.preventiva-envio .envio-substituicao summary:hover { background: #edf1f5; }
+.preventiva-envio .envio-substituicao summary:focus-visible { outline: 3px solid #215bc1; outline-offset: 2px; }
+.preventiva-envio .envio-substituicao form { background: #f8fafc; border-radius: 8px; padding: .5rem .75rem .75rem; margin-top: .5rem; }
+.preventiva-envio .envio-arquivo-atual { background: var(--modulo-suave); border-radius: 8px; padding: .8rem; overflow-wrap: anywhere; font-size: .9rem; }
+.preventiva-envio .btn:disabled { opacity: .55; }
+@media (max-width: 575px) {
+    .preventiva-envio .envio-identificacao h3 { display: block; margin-bottom: .2rem; }
+}

@@ -5,7 +5,15 @@
 {% block modulo_conteudo %}
     {{ cabecalho('Resultado da preventiva', 'Confira as informações reunidas e baixe a planilha para continuar seu trabalho.', 'bi-lightning-charge', 'Rotina pronta') }}
     <div class="modulo-acoes mb-4">
-        <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-outline-secondary">Nova análise</a>
+        {% if preventiva_guiada %}
+        <a href="{{ url_for('rotas.pagina_analise') }}" class="btn btn-outline-secondary">Voltar aos arquivos</a>
+        <form method="post" action="{{ url_for('rotas.limpar_arquivo') }}" data-confirmar-limpeza>
+            <input type="hidden" name="csrf" value="{{ session.preventiva_envio_csrf }}">
+            <button type="submit" class="btn btn-outline-secondary">Nova análise</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('rotas.pagina_analise') }}" class="btn btn-outline-secondary">Nova análise</a>
+        {% endif %}
         <a href="{{ url_for('rotas.baixar_relatorio_preventiva') }}" class="btn btn-modulo"><i class="bi bi-download me-2" aria-hidden="true"></i>Baixar Excel</a>
     </div>
     <section class="card painel-modulo"><div class="card-body">
@@ -32,4 +40,9 @@
             <div class="estado-vazio"><i class="bi bi-search" aria-hidden="true"></i><p>Nenhum resultado disponível.</p><span>Confira os arquivos selecionados e faça uma nova análise.</span></div>
         {% endif %}
     </div></section>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script defer src="{{ url_for('static', filename='js_preventiva/envio_guiado.js', v=1) }}"></script>
 {% endblock %}

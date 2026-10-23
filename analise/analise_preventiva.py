@@ -4,16 +4,33 @@ import os
 import sys
 import locale
 import re
+import json
 
 
 caminho_script = os.path.abspath(__file__)
 diretorio_analise = os.path.dirname(caminho_script)
 diretorio_raiz = os.path.dirname(diretorio_analise)
 sys.path.append(diretorio_raiz)
-caminho_dados = os.path.join(diretorio_raiz, 'dados_preventiva')
+caminho_dados = os.environ.get('PREVENTIVA_INPUT_DIR') or os.path.join(diretorio_raiz, 'dados_preventiva')
+caminho_resultados = os.environ.get('PREVENTIVA_OUTPUT_DIR') or caminho_dados
+abas_envio = {}
+arquivos_envio = None
+if os.environ.get('PREVENTIVA_INPUT_DIR'):
+    # Usa exclusivamente os seis arquivos confirmados neste envio.
+    with open(os.path.join(caminho_dados, 'envio.json'), encoding='utf-8') as manifesto:
+        envio = json.load(manifesto)
+    if set(envio) != {'preventiva', 'carreta', 'esl', 'mobile', 'produtos', 'notas'}:
+        raise ValueError('Envie e confirme os seis relatórios antes de analisar.')
+    arquivos_envio = [item['arquivo'] for item in envio.values()]
+    abas_envio = {item['arquivo']: item['aba'] for item in envio.values()}
+    for nome in arquivos_envio:
+        if os.path.basename(nome) != nome or not os.path.isfile(os.path.join(caminho_dados, nome)):
+            raise ValueError('Um dos relatórios enviados não está mais disponível. Envie-o novamente.')
+
 
 from app.utils import formatar_colunas, formatar_coluna_pedidos , formatar_coluna_data
 from db.db_preventiva import buscar_ultimo_raw, salvar_dados_base
+from analise.tratamento_bipe_produtos import ler_bipe_produtos
 
 
 def preservar_chaves_fiscais(df, coluna, fonte):
@@ -90,11 +107,11 @@ def cruzar_mobile(base, mobile):
 
 df_preventiva = df_carreta = df_esl = df_mobile = df_bipe = df_bipe_notas = None
 
-for arquivo in os.listdir(caminho_dados):
+for arquivo in (arquivos_envio if arquivos_envio is not None else os.listdir(caminho_dados)):
     caminho_arquivo = os.path.join(caminho_dados, arquivo)
 
     if 'Preventiva' in arquivo:
-        df_preventiva = pd.read_excel(caminho_arquivo)
+        df_preventiva = pd.read_excel(caminho_arquivo, sheet_name=abas_envio.get(arquivo, 0))
         df_preventiva = formatar_colunas(df_preventiva)
         df_preventiva = df_preventiva.add_prefix('Preventiva_')
         df_preventiva = formatar_coluna_pedidos(df_preventiva,'Preventiva_Pedido 1P/Full')
@@ -102,7 +119,7 @@ for arquivo in os.listdir(caminho_dados):
         salvar_dados_base(df_preventiva, "raw_preventiva", coluna_chave="Preventiva_Pedido 1P/Full")
         
     elif 'Carreta' in arquivo:
-        df_carreta = pd.read_excel(caminho_arquivo, dtype=object)
+        df_carreta = pd.read_excel(caminho_arquivo, sheet_name=abas_envio.get(arquivo, 0), dtype=object)
         df_carreta = formatar_colunas(df_carreta)
         df_carreta = df_carreta.add_prefix('Carreta_')
         df_carreta = preservar_chaves_fiscais(df_carreta, 'Carreta_Chave', arquivo)
@@ -111,7 +128,7 @@ for arquivo in os.listdir(caminho_dados):
         salvar_dados_base(df_carreta,'raw_carreta', coluna_chave='Carreta_Pedido')
         
     elif 'magazine' in arquivo:
-        df_esl = pd.read_excel(caminho_arquivo, dtype=object)
+        df_esl = pd.read_excel(caminho_arquivo, sheet_name=abas_envio.get(arquivo, 0), dtype=object)
         df_esl = formatar_colunas(df_esl)
         df_esl = df_esl.add_prefix('Esl_')
         df_esl = preservar_chaves_fiscais(df_esl, 'Esl_Nota Fiscal/Chave Nf-E', arquivo)
@@ -119,21 +136,21 @@ for arquivo in os.listdir(caminho_dados):
 
         
     elif 'Mobile' in arquivo or 'entregas' in arquivo:
-        df_mobile = pd.read_excel(caminho_arquivo, dtype=object)
+        df_mobile = pd.read_excel(caminho_arquivo, sheet_name=abas_envio.get(arquivo, 0), dtype=object)
         df_mobile = formatar_colunas(df_mobile)
         df_mobile = df_mobile.add_prefix('Mobile_')
         df_mobile = formatar_coluna_pedidos(df_mobile, 'Mobile_Pedido')
         salvar_dados_base(df_mobile, "raw_mobile", coluna_chave="Mobile_Pedido")
         
     elif 'bipe_produtos' in arquivo:
-        df_bipe = pd.read_excel(caminho_arquivo)
+        df_bipe = ler_bipe_produtos(caminho_arquivo, sheet_name=abas_envio.get(arquivo, 0))
         df_bipe = formatar_colunas(df_bipe)
         df_bipe = df_bipe.add_prefix('Bipe_Prod_')
         df_bipe = formatar_coluna_pedidos(df_bipe, 'Bipe_Prod_Pedido')
         salvar_dados_base(df_bipe, 'raw_bipe_produtos',  coluna_chave='Bipe_Prod_Pedido')
         
     elif 'Bipe_de_notas' in arquivo:
-        df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name='Plan1')
+        df_bipe_notas = pd.read_excel(caminho_arquivo, sheet_name=abas_envio.get(arquivo, 'Plan1'))
         df_bipe_notas = formatar_colunas(df_bipe_notas)
         df_bipe_notas = df_bipe_notas.add_prefix('Bipe_Notas_')
         df_bipe_notas = formatar_coluna_pedidos(df_bipe_notas, 'Bipe_Notas_Nf')
@@ -282,7 +299,7 @@ salvar_dados_base(df_final_3, "analise_resultado", coluna_chave="Preventiva_Pedi
 
 data_hoje = datetime.today().strftime('%d-%m-%Y')
 nome_arquivo = f'Analise_preventiva {data_hoje}.xlsx'
-caminho_saida = os.path.join(caminho_dados, nome_arquivo)
+caminho_saida = os.path.join(caminho_resultados, nome_arquivo)
 
 with pd.ExcelWriter(
     caminho_saida,

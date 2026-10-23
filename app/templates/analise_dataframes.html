@@ -1,59 +1,143 @@
 {% extends 'base_modulo.html' %}
 {% from 'componentes/modulos.html' import cabecalho, carregamento %}
+{% macro campos(acao) %}
+    <input type="hidden" name="csrf" value="{{ session.preventiva_envio_csrf }}">
+    <input type="hidden" name="acao" value="{{ acao }}">
+{% endmacro %}
 {% block title %}Preventiva automática · Porta-a-Porta{% endblock %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_preventiva/envio_guiado.css', v=1) }}">
+{% endblock %}
 {% block modulo_tema %}tema-preventiva{% endblock %}
 {% block modulo_conteudo %}
     {{ carregamento() }}
-    {{ cabecalho('Preventiva automática', 'Reúna as informações dos pedidos usando as planilhas da rotina.', 'bi-lightning-charge', 'Rotina pronta') }}
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <section class="card painel-modulo mb-4">
+    {{ cabecalho('Preventiva automática', 'Envie os seis relatórios da rotina. Nós mostramos o que falta.', 'bi-lightning-charge', 'Rotina pronta') }}
+    <div class="row g-3 preventiva-envio">
+        <div class="col-lg-7">
+            <section class="card painel-modulo h-100" aria-labelledby="titulo-checklist">
                 <div class="card-body">
-                    <h2 class="h5"><span class="etapa-numero">1</span> Envie as planilhas</h2>
-                    <p class="text-muted">Selecione um ou mais arquivos. Você pode fazer novos envios antes de analisar.</p>
-                    <form method="POST" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data">
-                        <div class="arquivo-campo">
-                            <label for="arquivos" class="form-label">Arquivos da análise</label>
-                            <input class="form-control" type="file" id="arquivos" name="arquivos" accept=".xlsx,.xls" multiple required>
-                            <div id="file-list" class="arquivo-feedback" aria-live="polite"></div>
-                        </div>
-                        <div class="modulo-acoes"><button type="submit" class="btn btn-modulo"><i class="bi bi-upload me-2" aria-hidden="true"></i>Enviar planilhas</button></div>
+                    <div class="modulo-linha mb-2">
+                        <h2 id="titulo-checklist" class="h5 mb-0">Relatórios da análise</h2>
+                        <span class="contagem-arquivos">{{ estado.recebidos|length }} de 6 recebidos</span>
+                    </div>
+                    <p class="text-muted small mb-3">Você pode enviar em qualquer ordem e com qualquer nome de arquivo.</p>
+                    <ul class="envio-checklist">
+                    {% for tipo, info in relatorios.items() %}
+                        {% set recebido = estado.recebidos.get(tipo) %}
+                        <li class="envio-item {{ 'envio-recebido' if recebido else '' }}">
+                            <i class="bi {{ 'bi-check-circle-fill' if recebido else 'bi-circle' }} envio-icone" aria-hidden="true"></i>
+                            <div class="envio-identificacao">
+                                <h3>{{ info.titulo }}</h3>
+                                {% if recebido %}
+                                    <span class="envio-status">Recebido</span>
+                                    <p class="envio-nome">{{ recebido.original }}</p>
+                                    <details class="envio-substituicao">
+                                        <summary>Substituir arquivo<span class="visually-hidden"> de {{ info.titulo }}</span></summary>
+                                        <form method="post" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data">
+                                            {{ campos('enviar') }}
+                                            <input type="hidden" name="substituir" value="{{ tipo }}">
+                                            <label for="trocar-{{ tipo }}" class="form-label small mt-2">Novo arquivo de {{ info.titulo }}</label>
+                                            <input id="trocar-{{ tipo }}" name="arquivos" type="file" class="form-control form-control-sm" accept=".xlsx,.xls" required>
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm mt-2">Conferir substituição</button>
+                                        </form>
+                                    </details>
+                                {% else %}
+                                    <span class="envio-faltando">Falta enviar</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                    {% if estado.recebidos or estado.pendente %}
+                    <form method="post" action="{{ url_for('rotas.limpar_arquivo') }}" data-confirmar-limpeza class="mt-3">
+                        {{ campos('limpar') }}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Limpar e começar novamente</button>
                     </form>
-                </div>
-            </section>
-            <section class="card painel-modulo">
-                <div class="card-body">
-                    <div class="modulo-linha">
-                        <h2 class="h5 mb-0"><span class="etapa-numero">2</span> Confira e analise</h2>
-                        <span class="contagem-arquivos">{{ arquivos_presentes|length }} arquivo(s) enviado(s)</span>
-                    </div>
-                    <div class="arquivos-enviados">
-                        {% if arquivos_presentes %}
-                            <ul class="lista-arquivos">
-                                {% for arq in arquivos_presentes %}<li><i class="bi bi-file-earmark-spreadsheet" aria-hidden="true"></i><span>{{ arq }}</span></li>{% endfor %}
-                            </ul>
-                        {% else %}
-                            <div class="estado-vazio"><i class="bi bi-folder2-open" aria-hidden="true"></i><p>Nenhum arquivo enviado nesta etapa.</p><span>Use o formulário acima para selecionar suas planilhas.</span></div>
-                        {% endif %}
-                    </div>
-                    <div class="modulo-acoes">
-                        <a href="{{ url_for('rotas.limpar_arquivo') }}" class="btn btn-outline-danger">Limpar arquivos</a>
-                        <form id="form-analise" method="GET" action="{{ url_for('rotas.conferencia_qtd_arquivos') }}">
-                            <input type="hidden" name="processar" value="true">
-                            <button type="submit" class="btn btn-modulo"><i class="bi bi-lightning-charge me-2" aria-hidden="true"></i>Analisar preventiva</button>
-                        </form>
-                    </div>
+                    {% endif %}
                 </div>
             </section>
         </div>
-        <aside class="col-lg-4">
-            <div class="painel-ajuda">
-                <span class="modulo-legenda">Antes de começar</span>
-                <h2 class="h5">Use os arquivos da rotina</h2>
-                <ul class="lista-orientacoes"><li>Preventiva</li><li>Entrada de Carreta</li><li>Relatório ESL</li><li>Mobile Entregas</li><li>Bipe de produtos</li><li>Bipe de notas</li></ul>
-                <p>Este módulo utiliza nomes, abas e colunas já definidos. Mantenha o padrão habitual dos arquivos.</p>
-                <p class="mb-0">Precisa escolher outras colunas? Use a <a href="{{ url_for('cruzamento.index') }}">Análise personalizada</a>.</p>
-            </div>
-        </aside>
+        <div class="col-lg-5">
+            {% if estado.pendente %}
+            <section id="confirmar-arquivo" class="card painel-modulo mb-3" aria-labelledby="titulo-confirmar">
+                <div class="card-body">
+                    <span class="modulo-legenda">Arquivo aguardando confirmação</span>
+                    <h2 id="titulo-confirmar" class="h5">Qual relatório você está enviando?</h2>
+                    <p class="envio-arquivo-atual"><i class="bi bi-file-earmark-spreadsheet me-2" aria-hidden="true"></i>{{ estado.pendente.original }}</p>
+                    <form method="post" action="{{ url_for('rotas.adicionar_dados') }}">
+                        {{ campos('confirmar') }}
+                        <input type="hidden" name="pendente" value="{{ estado.pendente.token }}">
+                        {% if estado.pendente.substituir %}
+                            <input type="hidden" name="tipo" value="{{ estado.pendente.substituir }}">
+                            <p>Substituindo: <strong>{{ relatorios[estado.pendente.substituir].titulo }}</strong></p>
+                            <p class="text-muted small">O arquivo anterior será mantido até a confirmação do novo.</p>
+                        {% else %}
+                        <label for="tipo-relatorio" class="form-label">Tipo de relatório</label>
+                        <select id="tipo-relatorio" name="tipo" class="form-select mb-3" required autofocus>
+                            <option value="">Selecione o relatório...</option>
+                            {% for tipo, info in relatorios.items() %}
+                                {% if tipo not in estado.recebidos %}<option value="{{ tipo }}">{{ info.titulo }}</option>{% endif %}
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                        {% if estado.pendente.abas|length > 1 %}
+                        <label for="aba-relatorio" class="form-label">Aba da planilha</label>
+                        <select id="aba-relatorio" name="aba" class="form-select mb-3" aria-describedby="ajuda-aba">
+                            <option value="">Identificar pelas colunas</option>
+                            {% for aba in estado.pendente.abas %}<option value="{{ aba }}">{{ aba }}</option>{% endfor %}
+                        </select>
+                        <p id="ajuda-aba" class="small text-muted">Se houver mais de uma aba com as mesmas colunas, selecione a que deseja usar.</p>
+                        {% endif %}
+                        <button type="submit" class="btn btn-modulo w-100">Confirmar relatório</button>
+                    </form>
+                    <form method="post" action="{{ url_for('rotas.adicionar_dados') }}" class="mt-2">
+                        {{ campos('cancelar') }}
+                        <button type="submit" class="btn btn-outline-secondary w-100">Cancelar este envio</button>
+                    </form>
+                </div>
+            </section>
+            {% elif not completos %}
+            <section class="card painel-modulo mb-3" aria-labelledby="titulo-enviar">
+                <div class="card-body">
+                    <h2 id="titulo-enviar" class="h5">Enviar um relatório</h2>
+                    <p class="text-muted">Escolha um arquivo. Na próxima etapa, indique qual relatório ele contém.</p>
+                    <form method="post" action="{{ url_for('rotas.adicionar_dados') }}" enctype="multipart/form-data">
+                        {{ campos('enviar') }}
+                        <div class="arquivo-campo">
+                            <label for="arquivos" class="form-label">Arquivo da planilha</label>
+                            <input class="form-control" type="file" id="arquivos" name="arquivos" accept=".xlsx,.xls" aria-describedby="ajuda-arquivo" required>
+                            <p id="ajuda-arquivo" class="mb-0 mt-2">Excel (.xlsx ou .xls), até 25 MB por arquivo. Não precisa renomear.</p>
+                            <p class="mb-0 mt-2">Bipe de produtos: pode enviar o arquivo direto do depósito. O sistema prepara os pedidos automaticamente.</p>
+                            <div id="file-list" class="arquivo-feedback" aria-live="polite"></div>
+                        </div>
+                        <button type="submit" class="btn btn-modulo w-100"><i class="bi bi-upload me-2" aria-hidden="true"></i>Enviar arquivo</button>
+                    </form>
+                </div>
+            </section>
+            {% endif %}
+            <section class="card mb-3" aria-labelledby="titulo-iniciar">
+                <div class="card-body">
+                    <h2 id="titulo-iniciar" class="h5">{{ 'Tudo pronto para analisar' if completos and not estado.pendente else 'Preparar a análise' }}</h2>
+                    {% if completos and not estado.pendente %}
+                    <p class="text-muted">Os seis relatórios foram recebidos. Agora podemos reunir as informações dos pedidos.</p>
+                    {% else %}
+                    <p class="text-muted">{{ 'Confirme ou cancele o arquivo pendente para continuar.' if estado.pendente else 'O botão será liberado quando os seis relatórios estiverem recebidos.' }}</p>
+                    {% endif %}
+                    <form id="form-analise" method="post" action="{{ url_for('rotas.analisar_dados') }}">
+                        {{ campos('analisar') }}
+                        <button type="submit" class="btn btn-modulo w-100" {% if not completos or estado.pendente %}disabled{% endif %}><i class="bi bi-lightning-charge me-2" aria-hidden="true"></i>Iniciar análise</button>
+                    </form>
+                    {% if estado.resultado %}
+                        <a href="{{ url_for('rotas.analisar_dados') }}" class="btn btn-outline-secondary w-100 mt-2">Ver último resultado desta análise</a>
+                    {% endif %}
+                </div>
+            </section>
+            <p class="small text-muted px-1">Precisa escolher outras colunas? Use a <a href="{{ url_for('cruzamento.index') }}">Análise personalizada</a>.</p>
+        </div>
     </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script defer src="{{ url_for('static', filename='js_preventiva/envio_guiado.js', v=1) }}"></script>
 {% endblock %}

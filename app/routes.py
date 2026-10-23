@@ -45,11 +45,11 @@ def pagina_analise():
 def adicionar_dados():
     return adicionar_arquivo(request)
    
-@rotas.route('/analisar_dados')
+@rotas.route('/analisar_dados', methods=['GET', 'POST'])
 def analisar_dados():
     return analisar_preventiva(request)
 
-@rotas.route('/limpar_arquivos')
+@rotas.route('/limpar_arquivos', methods=['GET', 'POST'])
 def limpar_arquivo():
     return excluir_arquivos()
 
